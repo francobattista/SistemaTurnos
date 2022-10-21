@@ -1,0 +1,45 @@
+El front apunta el gateway. El gateway redireccion por http. Si gateway/x -> redirecciono a x
+
+/gateway/buscador/n -> un microservicio
+
+
+
+/gateway/auth/n -> otro microservicio
+
+
+
+Seguramente la idea sea la siguiente:
+Como no se puede usar express, hay que usar http y crear enpoints de forma casera, alpedo y una cagada. El gateway va a ser quien reciba todas las peticiones
+
+El gateway va a estar escuchando el puerto EJ:8080 
+
+El usuario lanza el fetch -> localhost...:8080/gateway/login con sus parametros y todo. El microservicio de login va a estar levantado en otro puerto, entonces el gateway
+lo unico que va a ser es redireccionar esta peticion. Asi como un loader del servidor que distribuye la carga. ENtonces le tira un http al login que esta levantado en tal puerto y este retorna lo que debe hacer y 
+bla bla bla
+
+Tambien, cada micros puede estar levantado en un puerto distinto, comunicando por http
+
+
+https://github.com/dotnet-architecture/eShopOnContainers
+
+https://www.youtube.com/watch?v=UPH6VkaVyo4
+
+
+
+
+PARA LOS MAPAS:
+
+
+<iframe src="https://app.cartes.io/maps/048eebe4-8dac-46e2-a947-50b6b8062fec/embed?type=map"
+  width="100%"
+  height="400"
+  frameborder="0"></iframe>
+
+Este es el objeto con el que interactuamos.
+
+
+Podemos crear un mapa personalizado, tirando el get a https://cartes.io/api/maps/ id de mapa
+
+Con ese interactuamos. Se necesitan los header. 
+
+Creo que para mostrarlo solo basta con el iframe y desp para los post de las sucursales tirandole post a el enpoint

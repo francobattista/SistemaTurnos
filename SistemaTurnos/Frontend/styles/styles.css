@@ -1,0 +1,34 @@
+
+
+
+#lista :hover{
+
+    background-color: lightblue;
+    border-radius: 5px;
+}
+
+
+#formReserva{
+
+    justify-content: center;
+}
+
+#tableDias{
+    background-color: red;
+    width: 100%;
+    height: 200px;
+    display: flex;
+    flex-wrap: wrap;
+    position: relative;
+}
+
+
+.containerhs{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+
+}
+
+.containerhs div :hover{
+    background-color: red;
+}
