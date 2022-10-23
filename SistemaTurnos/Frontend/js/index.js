@@ -1,5 +1,5 @@
 import {router} from './router/index.router.js'
-
+import { reservaTurno } from './connectionService.js'
 
 
 /*console.log(router())
@@ -43,15 +43,7 @@ tabla.appendChild(childDiv4)
 
 
 childDiv1.addEventListener('click', (event) => {
-
-    
-    fetch("http://localhost:8080/", {
-        method: 'GET',
-        headers: new Headers({ 'Content-type': 'application/json'}),
-        mode: 'no-cors'
-}).then((response) => {
-        console.log(response)
-    })
+    reservaTurno()
 });
 
 
