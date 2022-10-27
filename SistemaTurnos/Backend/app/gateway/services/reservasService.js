@@ -39,10 +39,11 @@ const putMethod = (endpoint,body) => {
     console.log(enviroment_host + enviroment_port +  endpoint)
     return new Promise((resolve,reject) => {
 
+        console.log(body)
         const options = {
             port: 8080,
             hostname: '127.0.0.1',
-            method: 'GET',
+            method: 'PUT',
             path: endpoint,
             headers:{
             'Content-Type': 'application/json',
@@ -51,10 +52,8 @@ const putMethod = (endpoint,body) => {
           };
 
           console.log("por hacer el put!")
-        http.request(options).once('response', (response) =>
-
-        //http.request(enviroment_host + enviroment_port + endpoint,{method: "PUT", body:body , headers: putHeader}).once('response', (response) => 
-        {
+        const r = http.request(options,(response)=>{
+        
             console.log("aca!")
             response.once('data', (data) => {
                 console.log("aca!")
@@ -66,6 +65,9 @@ const putMethod = (endpoint,body) => {
                 reject()
             })
         });
+        r.write(body);
+        r.on('error', (e) => console.log(e))
+        r.end()
     })  
 }
 /*

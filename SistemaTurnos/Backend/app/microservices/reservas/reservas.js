@@ -13,56 +13,85 @@ const responseHeaders = {
 
 const codes = {statusOk:200, notFound: 404}
 
+const bodyParser = (req,res) =>{
+    return new Promise((res,rej)=>{
+        console.log('processReqB')
+        let body='';
+        req.on('data', (c) => {
+            body += c;
+            console.log(body)
+        })
+        req.on('end', () => {
+            console.log("end")
+            res(body)
+        })
+
+        req.on('error',() => {
+            rej();
+        })
+    })
+}
+    
+
+
 
 const reparteRequest = (request,response,url,method) =>{
     switch(method){
-        case 'GET': processRequestGet(request,response,url);
+        case 'GET': 
+            processRequestGet(request,response,url);
+            break;
         case 'POST':;
-        case 'PUT': processRequestPut(request,response,url);;
-        case 'DELETE':;
+            break;
+        case 'PUT': 
+            processRequestPut(request,response,url);
+            break;
+        case 'DELETE':
+            break;
+        case 'OPTIONS':
+            response.writeHead(codes.statusOk,responseHeaders);
+            response.end(JSON.stringify({Hola:123}));
+            break;
         default:;
     }
 }
 
 const processRequestPost = (req,res,url) => {}
+
+
 const processRequestPut = (req,res,url) => {
-
-    let body='';
-    req.on('data',(c)=>{
-        body += c;
-    })
-
-
-    let respuesta;
-    const slug = url.split('/api/reserva/')[1]; // Tengo que tener una forma de diferenciar si es para usuario o sucursal... (reserva no pq nunca va a ser get)
-    if(slug) //aunque tengo q saber si es reserva o sucursal...
-    {   
-        console.log(body);
-        if(body)
-        {
-            let ok = false;
-            let reservas = JSON.parse(fs.readFileSync('./reservas.json').toString())
-            reservas.map((element) => {
-                if(element.id == slug)
-                    if(element.userId == "")
-                    {
-                        element.userId = body.userId
-                        ok = true;
-                    }
-            })
-            if(ok)
+    console.log('processReq')
+    bodyParser(req,res).then( (body) => {
+        req.body = JSON.parse(body);
+        let respuesta;
+        console.log("dentro de bodyParser")
+        const slug = url.split('/api/reserva/')[1]; // Tengo que tener una forma de diferenciar si es para usuario o sucursal... (reserva no pq nunca va a ser get)
+        if(slug) //aunque tengo q saber si es reserva o sucursal...
+        {   
+            if(body)
             {
-                fs.writeFileSync('./reservas.json', JSON.stringify(reservas));
-                res.writeHead(codes.statusOk,responseHeaders)
-                res.end(JSON.stringify({Message: "Todo OK"})) //Me puedo dar la libertad de hacer esto, porque el readFile es async, entonces bloquea. Preguntar por si acaso si se prefiere que readF sea async
-                return;
+                let ok = false;
+                let reservas = JSON.parse(fs.readFileSync('./reservas.json').toString())
+                reservas['reservas'].map((element) => {
+                    if(element.id == slug)
+                        if(element.userID == "")
+                        {
+                            element.userID = req.body.userId
+                            ok = true;
+                        }
+                })
+                if(ok)
+                {
+                    fs.writeFileSync('./reservas.json', JSON.stringify(reservas));
+                    res.writeHead(codes.statusOk,responseHeaders)
+                    res.end(JSON.stringify({Message: "Todo OK"})) //Me puedo dar la libertad de hacer esto, porque el readFile es async, entonces bloquea. Preguntar por si acaso si se prefiere que readF sea async
+                    return;
+                }
+
             }
-
         }
-    }
-    res.writeHead(codes.notFound,responseHeaders) //podria ser otro error.
-    res.end(JSON.stringify({Message: "Todo MAL"}))
-
+        res.writeHead(codes.notFound,responseHeaders) //podria ser otro error.
+        res.end(JSON.stringify({Message: "Todo MAL"}))
+        })
 
  
 }
@@ -92,6 +121,7 @@ const server = http.createServer( (request,response) =>
 
     console.log("llego?")
     const {method , url} = request;
+    console.log(method)
     if(url.startsWith('/api/reserva'))
     {
         reparteRequest(request,response,url,method);
@@ -99,7 +129,7 @@ const server = http.createServer( (request,response) =>
     }
 
 
-    response.writeHead(codes.notFound,headers)
+    response.writeHead(codes.notFound,responseHeaders)
     response.end();
     
     //Si las solicitudes llegan a paths erroneos devolver codigos de error

@@ -46,7 +46,7 @@ tabla.appendChild(childDiv4)
 
 childDiv1.addEventListener('click', (event) => {
     
-    altaReserva(1,'franco',2);
+    altaReserva(1,'franco',2); //Me esta tirando un reload porque modifica el archivo reservas.json -> entonces como esta todo en el proyecto levantado con el live server, lo reinicia
 
     //bajaReserva();
     //getSucursales();
