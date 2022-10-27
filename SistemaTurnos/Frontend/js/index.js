@@ -1,5 +1,6 @@
 import {router} from './router/index.router.js'
-import { reservaTurno } from './connectionService.js'
+import { altaReserva, getTurnosSucursal } from './services/reservasService.js'
+import { getSucursal, getSucursales } from './services/sucursalesService.js'
 
 
 /*console.log(router())
@@ -42,8 +43,17 @@ childDiv4.style = "background-color: blue; height: 50px; width: 50px; position: 
 tabla.appendChild(childDiv4)
 
 
+
 childDiv1.addEventListener('click', (event) => {
-    reservaTurno()
+    
+    altaReserva(1,'franco',2);
+
+    //bajaReserva();
+    //getSucursales();
+
+    //getSucursal(1)
+    //getTurnosSucursal(2);
+    //reservaTurno()
 });
 
 

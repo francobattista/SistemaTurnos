@@ -1,0 +1,19 @@
+
+{
+    "sucursales":
+    [ 
+        {
+            "id": 1,
+            "lat": 1000,
+            "lng":1000,
+            "name":"SUCURSAL"
+        },
+        {
+            "id": 2,
+            "lat": 1001,
+            "lng":1001,
+            "name":"SUCURSAL2"
+        }
+    ]
+      
+}

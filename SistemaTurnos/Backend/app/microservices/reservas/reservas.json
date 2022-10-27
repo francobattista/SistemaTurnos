@@ -1,13 +1,25 @@
 {
     "reservas" : 
-    [
-        {
-            "nombre" : "Franco"
-        },
-        {
-            "nombre" : "Franco2"
-        }
+    [ {
+        "id":"1",
+        "dateTime":"date",
+        "branchId":"1",
+        "userID":""
+      },
+      {
+        "id":"2",
+        "dateTime":"date",
+        "branchId":"1",
+        "userID":""
+      },
+      {
+        "id":"3",
+        "dateTime":"date",
+        "branchId":"2",
+        "userID":""
+      }
     ]
+      
 
 }
  
