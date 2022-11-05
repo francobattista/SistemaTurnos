@@ -59,26 +59,31 @@ const processRequestGet = (req,res,url) =>
 }
 
 
-const server = http.createServer( (request,response) =>
+const server = http.createServer( (req,res) =>
 { 
     //ACA RECIBE LAS PETICIONES, LLAMADAS REQUEST
  
-    const {method , url} = request;
-
-    if(url.startsWith('/api/sucursales'))
+    const {method , url} = req;
+    console.log("sucursalesService")
+    if(url.startsWith('/api/sucursales/') || url === '/api/sucursales')
     {
-        reparteRequest(request,response,url,method)
+        reparteRequest(req,res,url,method)
         return;
     }
 
-    response.writeHead(codes.notFound);
-    response.end();
+    createErrorResponse(req,'No se ha encontrado el recurso solicitado')
     //Si las solicitudes llegan a paths erroneos devolver codigos de error
 });
 
 
+const createErrorResponse = (res,message) =>{
+
+    res.writeHead(codes.notFound,responseHeaders);
+    res.end(JSON.stringify({messageError: message}))
+
+}
 
 
 server.listen( port, (req,res) => {
-    console.log(`GATEWAY: Levantado en puerto ${port}`)
+    console.log(`SERVIDOR DE SUCURSALES: Levantado en puerto ${port}`)
 } )

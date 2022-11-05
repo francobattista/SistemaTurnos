@@ -20,33 +20,30 @@ const responseHeaders = {
 const codes = {statusOk:200, notFound: 404}
 
 
-const reparteRequest = (request,response,url,method) =>{
+const reparteRequest = (req,res,url,method) =>{
     console.log(method)
     switch(method)
     {
         case "GET":
-            redirectRequestGet(request,response,url)
+            redirectRequestGet(req,res,url)
             break;
         case "POST":
-            redirectRequestPost(request,response,url)
+            redirectRequestPost(req,res,url)
             break;
         case "DELETE":
-            redirectRequestDelete(request,response,url)
+            redirectRequestDelete(req,res,url)
             break;
-        case "OPTIONS": // || "PUT" 
-            //console.log("OPTIONSSW")
-            //redirectRequestPut(request,response,url)
-            response.writeHead(codes.statusOk,responseHeaders);
-            response.end(JSON.stringify({Hola:123}));
+        case "OPTIONS":
+            res.writeHead(codes.statusOk,responseHeaders);
+            res.end(JSON.stringify({Hola:123}));
             break;
         case "PUT":
             console.log("PUTSW")
-            redirectRequestPut(request,response,url)
+            redirectRequestPut(req,res,url)
             break;
         default:
             console.log("default")
-            response.writeHead(codes.notFound,responseHeaders);//codigoError
-            response.end(JSON.stringify({error:"ERROR: METODO DESCONOCIDO"}));
+            createErrorResponse(res,'Metodo desconocido');
             break;
         }
 }
@@ -64,64 +61,38 @@ const bodyParser = (req,res) =>{
         })
 
         req.on('error',() => {
-            rej();
+            rej('Error en el body');
         })
     })
     
 
 }
-/*const reservas = (req,res,path) => 
-{
-    reservasService.getReservasSucursal(res,req,path);
-
-    //reservasService.getReservasUsuario(res,req,path); 
-}*/
-
-/*
-const sucursales = (req,res,url)  => {
-
-    idSucursal = url.split('/api/sucursales/')[1];
-    if(idSucursal)
-        sucursalesService.getSucursal(req.headers,idSucursal).then(//hace falta diferenciar? total, solo con redireccionar la url todo ok
-        (respuesta) => {
-            res.writeHead(codes.statusOk,responseHeaders); res.end(JSON.stringify(respuesta))
-        }).catch((err)=>{}); 
-    else
-        sucursalesService.getSucursales().then(
-        (respuesta) => {
-            res.writeHead(codes.statusOk,responseHeaders); res.end(JSON.stringify(respuesta))
-        }).catch((err) => {});
-        
-
-    //else
-    
-}*/
-
-
 
 const redirectRequestDelete = (req,res,url) => {};
 
 
+//MANEJO LOS PUTS. 
 
 const redirectRequestPut = (req,res,url) => {
 
-    bodyParser(req,res).then( (body) => {
+    bodyParser(req,res).then( (body) => 
+    {
         req.body = body;
         console.log(req.body)
-        if(url.startsWith('/api/reserva/'))
+        if(url.startsWith('/api/reservas/')) 
         {
             reservasService.putMethod(url,req.body).then( //No me importa si va a reservas/1 o a reservas/. Solo redirecciono y que se arregle reservas.js
             (respuesta) => {
                 console.log(respuesta)
                 res.writeHead(codes.statusOk,responseHeaders); res.end(JSON.stringify(respuesta))
-            }).catch((err)=>{res.writeHead(codes.notFound,responseHeaders); res.end(JSON.stringify({mensaje:"Error"}))}); 
+            }).catch((err)=>{createErrorResponse(res,err)}); 
             return; //para cortar ejec
         }
     
-        res.writeHead(codes.notFound,responseHeaders)
-        res.end();//codigo de rror
 
-    })
+        createErrorResponse(res,'No se encontro el recurso')
+
+    }).catch((err) => {createErrorResponse(res,err)})
 
 
 };
@@ -132,49 +103,43 @@ const redirectRequestPost = (req,res,url) => {};
 //MANEJO LOS GETS. 
 const redirectRequestGet = (req,res,url) => 
 {
-    if(url.startsWith('/api/reserva'))
+    if(url.startsWith('/api/reservas/') || url === '/api/reservas' || url.startsWith('/api/reservas?'))
     {
         reservasService.getMethod(url).then( //No me importa si va a reservas/1 o a reservas/. Solo redirecciono y que se arregle reservas.js
         (respuesta) => {
             console.log(respuesta)
-            res.writeHead(codes.statusOk,responseHeaders); res.end(JSON.stringify(respuesta))
-        }).catch((err)=>{res.writeHead(codes.notFound,responseHeaders); res.end(JSON.stringify({mensaje:"Error"}))}); 
+            res.writeHead(codes.statusOk,responseHeaders);console.log("por responder"); res.end(JSON.stringify(respuesta))
+        }).catch((err)=>{createErrorResponse(res,err)}); 
         return; //para cortar ejec
     }
 
-    if(url.startsWith('/api/sucursales')) 
+    console.log(url)
+    if(url.startsWith('/api/sucursales/') || url === '/api/sucursales') //Hay q ver si el enpoint va a ser asi sin / final
     {
         sucursalesService.getMethod(url).then(//hace falta diferenciar? total, solo con redireccionar la url todo ok
         (respuesta) => {
-            //console.log(respuesta)
             res.writeHead(codes.statusOk,responseHeaders); res.end(JSON.stringify(respuesta))
-        }).catch((err)=>{console.log(err)});
+        }).catch((err)=>{createErrorResponse(res,err)});
         return;
     }
 
-    res.writeHead(codes.notFound,responseHeaders)
-    res.end();//codigo de rror
-
-
+    createErrorResponse(res,'No se ha enconrtado el recurso solicitado')    
 
 }
 
 //Crea el server y recibe las request del cliente
-const server = http.createServer( (request,response) =>
+const server = http.createServer( (req,res) =>
 { 
 
 
-    const {method , url} = request;
-    console.log(url)
-    if(url.startsWith('/api'))
+    const {method , url} = req;
+    if(url.startsWith('/api/')) // /api sin la / no significa nada, preferible no tratarlo a no ser que se implemente algo con eso 
     {
-        reparteRequest(request,response,url,method)
+        reparteRequest(req,res,url,method)
         return;
     }
-    console.log("Aca no llega!")
-    response.writeHead(codes.notFound,responseHeaders);
-    response.end(JSON.stringify({error:1}));
-    
+
+    createErrorResponse(res,'No se ha enconrtado el recurso solicitado')    
 
 
     
@@ -183,9 +148,19 @@ const server = http.createServer( (request,response) =>
 
 
 
+const createErrorResponse = (res,message) =>{
+    res.writeHead(codes.notFound,responseHeaders);
+    res.end(JSON.stringify({"messageError": message}))
+
+}
+
+const createOkReponse = (res,message) => {
+
+}
+
 
 server.listen( port, () => {
-    console.log(`GATEWAY LEVANTADO EN EL PUERTO ${port}`)
+    console.log(`SERVIDOR DE GATEWAY: Levantado en puerto ${port}`)
 } )
 
 

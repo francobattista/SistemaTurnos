@@ -4,15 +4,21 @@
     [ 
         {
             "id": 1,
-            "lat": 1000,
-            "lng":1000,
-            "name":"SUCURSAL"
+            "lat": -38.029816,
+            "lng":-57.565525,
+            "name":"SUCURSAL1"
         },
         {
             "id": 2,
-            "lat": 1001,
-            "lng":1001,
+            "lat": -38.053853,
+            "lng":-57.596898,
             "name":"SUCURSAL2"
+        },
+        {
+            "id": 3,
+            "lat": -37.950591,
+            "lng":-57.556892,
+            "name":"SUCURSAL3"
         }
     ]
       
