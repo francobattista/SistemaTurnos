@@ -63,7 +63,7 @@ const processRequestPost = (req,res,url) => {
         notificationsService.confirmationEmail(req.url,req.body).then((response)=>{
             res.writeHead(codes.statusOk,responseHeaders); 
             res.end(JSON.stringify({message:'Confirmacion enviada con exito!'}))
-        }).catch((err) => {createErrorResponse(res,'No se ha podido enviar la confirmacion del mail' + err)});
+        }).catch((err) => {createErrorResponse(res,'No se ha podido enviar la confirmacion del mail')});
     })
 }
 const processRequestPut = (req,res,url) => {}

@@ -77,8 +77,8 @@ export default () => {
 
       const agregaListener = () =>
       {
-          console.log(fechaDeHoy.getDay()-1)
-          for(let index = fechaDeHoy.getDay()-1; index < fechasHTML.children.length; index++) {
+
+          for(let index = fechaDeHoy.getDate(); index < fechasHTML.children.length; index++) {
               const element = fechasHTML.children[index];
               element.addEventListener('click', (event) => 
               {

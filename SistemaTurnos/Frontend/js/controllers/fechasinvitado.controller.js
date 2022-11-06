@@ -13,7 +13,7 @@ export default (data) => {
         <button id="btnBackF">ATRAS!</button>
         <input type="text" id="inputEmail">
         <dialog id="dialogConfirm">
-        <p>CONFIRME SU TURNO</p>
+        <p>CONFIRME SU TURNO: TIENE UN MINUTO PARA HACERLO</p>
         <button id="Ok">OK</button>
         <button id="Cancel">CANCELAR</button>
         </dialog>
@@ -51,13 +51,14 @@ export default (data) => {
                         if(Number(dialog.returnValue))
                         {
                             confirmaReserva(event.target.body.idReserva,inputEmail.value,0).then((r) => {
-                                console.log(r)
-                            })
+                                alert("Reserva confirmada con exito!")
+                            }).catch((e) => alert("Error en la confirmacion de turno!"))
                         }
                         else
                         {
                             
                         }
+                        window.location.hash = '#/reservainvitado'
                     })
                 }).catch((err) => {console.log(err); alert("No se pudo reservar")})
             }
@@ -85,15 +86,23 @@ export default (data) => {
     const inputEmail = divElement.querySelector('#inputEmail');
     const horariosReserva = document.createElement("div");
     divElement.appendChild(horariosReserva)
-    data.forEach(element => {
-        const fecha = document.createElement("div")
-        const date = formateaFechas(element.dateTime);
-        fecha.innerHTML = date;
-        fecha.style = ""
-        fecha.body = element;
-        preparaFechas(fecha);
-        horariosReserva.appendChild(fecha);
-    });
+    if(data)
+    {
+        data.forEach(element => {
+            const fecha = document.createElement("div")
+            const date = formateaFechas(element.dateTime);
+            fecha.innerHTML = date;
+            fecha.style = ""
+            fecha.body = element;
+            preparaFechas(fecha);
+            horariosReserva.appendChild(fecha);
+        });
+    }
+    else
+    {
+        window.location.hash = "#/reservainvitado"
+    }
+
 
   
     return divElement;

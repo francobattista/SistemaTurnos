@@ -8,16 +8,16 @@ const enviroment_host = process.env.HOST || 'http://localhost:';
 //METODO GET
 const getMethod = (endpoint) => {
     return new Promise((resolve,reject) => {
-        console.log("por crearla")
         http.get(enviroment_host + enviroment_port + endpoint).once('response', (response) => 
         {
-            console.log("aa")
             response.once('data', (data) => {
                 respuesta = data.toString();
-                resolve(respuesta)
+                if(response.statusCode == 404)
+                    reject(respuesta)
+                else
+                    resolve(respuesta)
             })
             response.once('error', () =>{
-                console.log("err")
                 reject('Error en la respuesta desde: ' + endpoint)
             })
         }).once('error', (err) => {reject("Error en la respuesta de: '" + endpoint)});

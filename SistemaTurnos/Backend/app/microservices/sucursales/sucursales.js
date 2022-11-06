@@ -56,6 +56,10 @@ const processRequestGet = (req,res,url) =>
         body += chunk; 
     })
 
+    req.on('error', (err) =>{
+        createErrorResponse(req,"Error en la request en sucursales")
+    })
+
 }
 
 
@@ -77,10 +81,13 @@ const server = http.createServer( (req,res) =>
 
 
 const createErrorResponse = (res,message) =>{
-
     res.writeHead(codes.notFound,responseHeaders);
-    res.end(JSON.stringify({messageError: message}))
+    res.end(JSON.stringify({message: message}))
+}
 
+const createOkResponse = (res,data) => {
+    res.writeHead(codes.statusOk,responseHeaders);
+    res.end(JSON.stringify({data}))
 }
 
 

@@ -28,8 +28,8 @@ export default () => {
                     if(suc.location.coordinates[0] === element.lng && suc.location.coordinates[1] === element.lat)
                         drawed=true;
                 })
-                if(!drawed)
-                    deleteMarker(suc)
+                //if(!drawed)
+                  //  deleteMarker(suc)
 
             })
 

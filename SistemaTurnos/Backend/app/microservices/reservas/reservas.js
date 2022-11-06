@@ -22,20 +22,18 @@ const responseHeaders = {
 const codes = {statusOk:200, notFound: 404}
 
 const bodyParser = (req,res) =>{
-    return new Promise((res,rej)=>{
-        console.log('processReqB')
+    return new Promise((resolve,reject)=>{
         let body='';
         req.on('data', (c) => {
             body += c;
-            console.log(body)
         })
         req.on('end', () => {
             console.log("end")
-            res(body)
+            resolve(body)
         })
 
         req.on('error',() => {
-            rej();
+            reject();
         })
     })
 }
@@ -71,11 +69,9 @@ const processRequestPut = (req,res,url) => {
             req.body = JSON.parse(body);
         else
             req.body=''
-        let respuesta;
-        console.log("dentro de bodyParser")// /api/reservas/1
-        const slug = url.split('/api/reservas/')[1]; // Tengo que tener una forma de diferenciar si es para usuario o sucursal... (reserva no pq nunca va a ser get)
-        console.log(slug)
-        console.log(req.body)
+
+            const slug = url.split('/api/reservas/')[1]; // Tengo que tener una forma de diferenciar si es para usuario o sucursal... (reserva no pq nunca va a ser get)
+
         if(slug) //aunque tengo q saber si es reserva o sucursal...
         {   
             if(req.body)
@@ -83,7 +79,6 @@ const processRequestPut = (req,res,url) => {
                 if(slug.startsWith('solicitar/'))
                 {
                     const idReserva = url.split('solicitar/')[1]; // Tengo que tener una forma de diferenciar si es para usuario o sucursal... (reserva no pq nunca va a ser get)
-                    console.log(idReserva)
                     if(idReserva)
                     {
                         if(validaID(req.body.userId))
@@ -91,23 +86,22 @@ const processRequestPut = (req,res,url) => {
                             console.log("a")
                             let ok = false;
                             let reservas = JSON.parse(fs.readFileSync('./reservas.json').toString())
-                            let fecha;
-                            let sucursal;
                             reservas['reservas'].map((element) => { //nO ES NECESARIO Q SEA UN MAP
                                 if(element.idReserva == idReserva)
                                     if(element.userId == "-1" && element.status == '0') 
                                     {
-                                        element.userId = String(req.body.userId);
-                                        element.status = "1"
-                                        //fecha = new Date(element.dateTime);
-                                        ok = true;
+                                        //if(element)    
+                                            element.userId = String(req.body.userId);
+                                            element.status = "1"
+                                            //fecha = new Date(element.dateTime);
+                                            ok = true;
                                     }
                             })
                             if(ok)
                             {
                                 fs.writeFileSync('./reservas.json', JSON.stringify(reservas));
                                 res.writeHead(codes.statusOk,responseHeaders) 
-                                res.end(JSON.stringify({Message: "El turno fue reservado, confirmelo antes del minuto o sera dado de baja!"}))  
+                                res.end(JSON.stringify({message: "El turno fue reservado, confirmelo antes del minuto o sera dado de baja!"}))  
                                 let timeout = setTimeout(() => //Si al pasar los segundos, el turno no se confirmo, lo baja
                                 {
                                     console.log(idReserva)
@@ -129,18 +123,18 @@ const processRequestPut = (req,res,url) => {
                                     fs.writeFileSync('./reservas.json', JSON.stringify(reservas)); //Perdio el turno   
                                 }
                                 else
-                                    console.log("no lo perdio")//createErrorResponse(req,'El turno no se ha podido reservar!') NO PERDIO EL TURNO!
+                                    console.log("YA LO CONFIRMO EL TURNO!")//createErrorResponse(req,'El turno no se ha podido reservar!') NO PERDIO EL TURNO!
                                      
-                                }, 10000);
-
+                                }, 5000);
                                 return;
-
                             }
-                            createErrorResponse(req,'No se pudo reservar el turno porque no esta disponible!')
+                                createErrorResponse(res,'ERROR : No se pudo reservar el turno porque no esta disponible!')
                         }
+                        else
+                            createErrorResponse(res,'ERROR: Algun parametro es erroneo')
                     }
                     else   
-                    createErrorResponse(req,'La reserva no exisite!')
+                        createErrorResponse(res,'ERROR: idReserva es nulo')
                 }
                 else if(slug.startsWith('confirmar/'))
                 {
@@ -148,16 +142,13 @@ const processRequestPut = (req,res,url) => {
                     const idReserva = url.split('confirmar/')[1]; // Tengo que tener una forma de diferenciar si es para usuario o sucursal... (reserva no pq nunca va a ser get)
                     if(idReserva)
                     {
-                        console.log(idReserva)
                         if(validaID(req.body.userId) && validaEmail(req.body.email))
                         {
-                            console.log("body")
-                            console.log(req.body)
                             let ok = false;
                             let reservas = JSON.parse(fs.readFileSync('./reservas.json').toString())
                             let fecha;
-                            let sucursal;
-                            reservas['reservas'].map((element) => { //nO ES NECESARIO Q SEA UN MAP
+                            reservas['reservas'].map((element) => 
+                            { //nO ES NECESARIO Q SEA UN MAP
                                 if(element.idReserva == idReserva)
                                     if(element.userId == req.body.userId && element.status == 1) //la primer parte del if la tengo q mover mas arriba, para q no analice si viene un id vacio
                                     {
@@ -171,24 +162,27 @@ const processRequestPut = (req,res,url) => {
                             if(ok)
                             {
                                 fs.writeFileSync('./reservas.json', JSON.stringify(reservas));
-                                reservasNotificationService.createNotification(req.body.email, "CONFIRMACION TURNO",`Mi loko, el dia ${fecha.toLocaleDateString()} a la hora ${fecha.toLocaleTimeString()} reservaste un turnito en el #PotreroDeCoccaro `).then((a) => {
-                                    console.log(a)
+                                reservasNotificationService.createNotification(req.body.email, "CONFIRMACION TURNO",`Mi loko, el dia ${fecha.toLocaleDateString()} a la hora ${fecha.toLocaleTimeString()} reservaste un turnito en el #PotreroDeCoccaro `).then((res) => {
+                                    console.log("CREATE NOTIFICATION: LLego al resolve " + res)
                                 })
-                                createRecordatorio(req.body,fecha).then(() => {
-                                    console.log("llego al resolve")
+                                createRecordatorio(req.body,fecha).then((res) => {
+                                    console.log("CREATE RECORDATORIO: LLego al resolve " + res)
                                 })
                                 res.writeHead(codes.statusOk,responseHeaders) //Pongo esto aca pq el turno se reservo c exito, depsues lo q pase con la notificacion veo despues
-                                res.end(JSON.stringify({message: "El turno se confirmo con exito"})) //Me puedo dar la libertad de hacer esto, porque el readFile es async, entonces bloquea. Preguntar por si acaso si se prefiere que readF sea async
+                                res.end(JSON.stringify({message: "El turno se confirmo con exito!"})) //Me puedo dar la libertad de hacer esto, porque el readFile es async, entonces bloquea. Preguntar por si acaso si se prefiere que readF sea async
                                 return;
                             }
                             else
                                 createErrorResponse(res,'No se ha podido registrar la reserva')
                         }
+                        else
+                            createErrorResponse(res, 'ERROR: algun parametro es erroneo')
                     }
                     else
-                        createErrorResponse(res,'idReserva nulo')
+                        createErrorResponse(res,'ERROR: idReserva nulo')
                 }
-                createErrorResponse(res,'Algun parametro es erroneo');
+                else
+                    createErrorResponse(res,'ERROR: Recurso no encontrado');                
             }
             else //Es un delete
             {
@@ -208,14 +202,16 @@ const processRequestPut = (req,res,url) => {
                     res.end(JSON.stringify({Message: "El turno se ELIMINO con exito"})) //Me puedo dar la libertad de hacer esto, porque el readFile es async, entonces bloquea. Preguntar por si acaso si se prefiere que readF sea async
                     return;
                 }
-
+                else
+                    createErrorResponse(res, "ERROR: No se ha podido eliminar el turno")
             }
         }
-        createErrorResponse(req,"Algo ocurrio mal: un parametro es erroneo")
+        else
+            createErrorResponse(res,"ERROR: un parametro es erroneo")
 
         }).catch((err) => 
         {        
-            createErrorResponse(req,err)
+            createErrorResponse(res,err)
         })
 
  

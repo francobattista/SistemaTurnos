@@ -83,16 +83,15 @@ const redirectRequestPut = (req,res,url) => {
         {
             reservasService.putMethod(url,req.body).then( //No me importa si va a reservas/1 o a reservas/. Solo redirecciono y que se arregle reservas.js
             (respuesta) => {
+                console.log("rta")
                 console.log(respuesta)
                 res.writeHead(codes.statusOk,responseHeaders); res.end(JSON.stringify(respuesta))
-            }).catch((err)=>{createErrorResponse(res,err)}); 
+            }).catch((err)=>{createErrorResponse(res,"Error en el put enviado a las reservas")}); 
             return; //para cortar ejec
         }
-    
-
         createErrorResponse(res,'No se encontro el recurso')
 
-    }).catch((err) => {createErrorResponse(res,err)})
+    }).catch((err) => {createErrorResponse(res,"Error, parametros de body incorrectos")})
 
 
 };
@@ -141,7 +140,6 @@ const server = http.createServer( (req,res) =>
 
     createErrorResponse(res,'No se ha enconrtado el recurso solicitado')    
 
-
     
     //Si las solicitudes llegan a paths erroneos devolver codigos de error
 });
@@ -149,12 +147,19 @@ const server = http.createServer( (req,res) =>
 
 
 const createErrorResponse = (res,message) =>{
+    console.log("Create error response:")
+    console.log(message)
     res.writeHead(codes.notFound,responseHeaders);
-    res.end(JSON.stringify({"messageError": message}))
+    res.end(JSON.stringify({message: message}))
 
 }
 
-const createOkReponse = (res,message) => {
+const createOkReponse = (res,data) => {
+
+    console.log("Create ok response")
+    console.log(data)
+    res.writeHead(codes.statusOk,responseHeaders)
+    res.end(JSON.stringify(data))
 
 }
 

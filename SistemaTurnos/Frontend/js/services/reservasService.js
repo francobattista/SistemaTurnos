@@ -69,7 +69,11 @@ const confirmaReserva = (idReserva,email,userId) => {
         }
 
         fetch("http://localhost:3030/api/reservas/confirmar/" + String(idReserva), config) // http://localhost:3030/api/reserva/1
-        .then((response) => {
+        .then((response) => 
+        {
+            console.log(response)
+            if(response.status == 404)
+                rej("Error en la respuesta de reservas al confirmar turno")
             response.json().then(data => res(JSON.parse(data)))
         }).catch((err) =>{ rej(err); } )
     })
@@ -119,7 +123,7 @@ return new Promise((res,rej) => {
 
 }
 
-//TODOS LOS TURNOS DE UNA SUCURSAL (CAMBIAR A QUERY PARAMS), O DE USUARIO EN UNA SUCURSAL
+//TODO S LOS TURNOS DE UNA SUCURSAL (CAMBIAR A QUERY PARAMS), O DE USUARIO EN UNA SUCURSAL
 
 
 const getTurnosByParam = (idUsuario, fecha, idSucursal) =>
