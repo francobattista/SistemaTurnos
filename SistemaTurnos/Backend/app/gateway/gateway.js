@@ -6,8 +6,8 @@ const reservasService = require('./services/reservasService.js')
 
 
 //Configuraciones del GATEWAY en archivo .env
-const port = process.env.PORT || 3030
-const host = process.env.HOST || '0.0.0.0'
+const enviroment_gatway_port = process.env.PORT || 3030
+const enviroment_gatway_host = process.env.HOST || '127.0.0.0'
 
 
 const responseHeaders = {
@@ -35,14 +35,12 @@ const reparteRequest = (req,res,url,method) =>{
             break;
         case "OPTIONS":
             res.writeHead(codes.statusOk,responseHeaders);
-            res.end(JSON.stringify({Hola:123}));
+            res.end(JSON.stringify({message:'OPTIONS REQUEST: OK!'}));
             break;
         case "PUT":
-            console.log("PUTSW")
             redirectRequestPut(req,res,url)
             break;
         default:
-            console.log("default")
             createErrorResponse(res,'Metodo desconocido');
             break;
         }
@@ -60,8 +58,8 @@ const bodyParser = (req,res) =>{
             res(body)
         })
 
-        req.on('error',() => {
-            rej('Error en el body');
+        req.on('error',(e) => {
+            rej('ERROR: El body enviado tiene errores');
         })
     })
     
@@ -83,13 +81,11 @@ const redirectRequestPut = (req,res,url) => {
         {
             reservasService.putMethod(url,req.body).then( //No me importa si va a reservas/1 o a reservas/. Solo redirecciono y que se arregle reservas.js
             (respuesta) => {
-                console.log("rta")
-                console.log(respuesta)
-                res.writeHead(codes.statusOk,responseHeaders); res.end(JSON.stringify(respuesta))
+                createOkReponse(res,respuesta)
             }).catch((err)=>{createErrorResponse(res,"Error en el put enviado a las reservas")}); 
             return; //para cortar ejec
         }
-        createErrorResponse(res,'No se encontro el recurso')
+        createErrorResponse(res,'ERROR: No se ha encontrado el recurso solicitado')    
 
     }).catch((err) => {createErrorResponse(res,"Error, parametros de body incorrectos")})
 
@@ -106,8 +102,7 @@ const redirectRequestGet = (req,res,url) =>
     {
         reservasService.getMethod(url).then( //No me importa si va a reservas/1 o a reservas/. Solo redirecciono y que se arregle reservas.js
         (respuesta) => {
-            console.log(respuesta)
-            res.writeHead(codes.statusOk,responseHeaders);console.log("por responder"); res.end(JSON.stringify(respuesta))
+            createOkReponse(res,respuesta)
         }).catch((err)=>{createErrorResponse(res,err)}); 
         return; //para cortar ejec
     }
@@ -117,12 +112,12 @@ const redirectRequestGet = (req,res,url) =>
     {
         sucursalesService.getMethod(url).then(//hace falta diferenciar? total, solo con redireccionar la url todo ok
         (respuesta) => {
-            res.writeHead(codes.statusOk,responseHeaders); res.end(JSON.stringify(respuesta))
+            createOkReponse(res,respuesta)
         }).catch((err)=>{createErrorResponse(res,err)});
         return;
     }
 
-    createErrorResponse(res,'No se ha enconrtado el recurso solicitado')    
+    createErrorResponse(res,'ERROR: No se ha encontrado el recurso solicitado')    
 
 }
 
@@ -164,8 +159,8 @@ const createOkReponse = (res,data) => {
 }
 
 
-server.listen( port, () => {
-    console.log(`SERVIDOR DE GATEWAY: Levantado en puerto ${port}`)
+server.listen( enviroment_gatway_port, () => {
+    console.log(`SERVIDOR DE GATEWAY: Levantado en puerto ${enviroment_gatway_port}`)
 } )
 
 

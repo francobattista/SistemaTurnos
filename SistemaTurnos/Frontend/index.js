@@ -1,6 +1,6 @@
 import {router} from '../js/router/index.router.js'
-import { dataReserva } from './js/controllers/reservaTurnoLog.controller.js'
-import { dataReservaInvitado } from './js/controllers/reservaInvitado.controller.js'
+import { dataReserva } from './js/controllers/login/reservaTurnoLog.controller.js'
+import { dataReservaInvitado } from './js/controllers/invitado/reservaInvitado.controller.js'
 let base_url = 'http://127.0.0.1:5500/SistemaTurnos/Frontend/html/';
 
 

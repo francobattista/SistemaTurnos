@@ -1,8 +1,7 @@
 //TODOS LOS TURNOS DE UN USUARIO PARA TODAS LAS SUCURSALES
 
-let uuidMap = '1bf15f94-d581-42e5-a602-bc7fafac3ab9'
-let srcMap = 'https://app.cartes.io/maps/' + uuidMap + '/embed?type=map';
-//src="https://app.cartes.io/maps/1bf15f94-d581-42e5-a602-bc7fafac3ab9/embed?type=map"
+let uuidMap = '8752b918-b3eb-4282-8ba7-571c40fce0c4'
+let srcMap = 'https://app.cartes.io/maps/' + uuidMap + '/embed?type=map&lat=-38.021465783288015&lng=-57.55720138549805&zoom=12';
 
 const getBaseMap = () => { 
     return new Promise((res,rej) => {
@@ -15,7 +14,7 @@ const getBaseMap = () => {
                 res(data)
                 
             })
-        }).catch(() =>{ rej('error'); } )
+        }).catch(() =>{ rej('ERROR: No se pudo dibujar el mapa'); } )
         
     })
 }
@@ -37,7 +36,7 @@ const addMarker = (element) => {
             body:body,
         }).then((response) => {
             response.json().then((data) => res((data)))
-        }).catch((err) =>{ rej(err); } )
+        }).catch((err) =>{ rej("ERROR: No se pudo dibujar el marker"); } )
     })
 
  
@@ -59,18 +58,7 @@ const deleteMarker = (element) => {
 
 }
 
-const getSucursalesFromMap = (uid) => {
-    return new Promise((res,rej) => {
 
-    fetch("https://cartes.io/api/maps/" + uuidMap + "/markers", {
-        method: 'GET',
-        headers: new Headers({ 'Accept': 'application/json'}),
-    }).then((response) => {
-        response.json().then((data) => res(JSON.parse(data)))
-    }).catch((err) =>{ rej(err); } )
-    }) 
-   
-}
 
 const getMapMarkers = () => {
     return new Promise((res,rej) => {

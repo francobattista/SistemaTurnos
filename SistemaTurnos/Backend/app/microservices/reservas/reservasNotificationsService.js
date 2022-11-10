@@ -3,10 +3,11 @@ const env = require('dotenv')
 
 env.config();
 
-const portNotificaciones = process.env.portNotificaciones || 8070
+const envirioment_port_reservas = process.env.RESERVAS_PORT || 8080
+const envirioment_path_reservas = process.env.RESERVAS_PATH || '127.0.0.0'
 
-//METODO GET
-//METODO POST
+const envirioment_port_notificaciones = process.env.NOTIFICACIONES_PORT || 8070
+const envirioment_path_notificaciones = process.env.RESERVAS_PATH || '127.0.0.0'
 
 const createNotification = (email,asunto,cuerpo) => {
     return new Promise((resolve,reject) => {
@@ -21,8 +22,8 @@ const createNotification = (email,asunto,cuerpo) => {
         console.log(body)
         
         const options = {
-            port: portNotificaciones,
-            hostname: '127.0.0.1',
+            port: envirioment_port_notificaciones,
+            hostname: envirioment_path_notificaciones,
             method: 'POST',
             path: '/api/notificacion',
             headers:{

@@ -1,7 +1,7 @@
 const http = require('http');
 
-const enviroment_port = process.env.RESERVAS_PORT || '8080' ;
-const enviroment_host = process.env.HOST || 'http://localhost:';
+const enviroment_reservas_port = process.env.RESERVAS_PORT || '8080' ;
+const enviroment_reservas_path = process.env.RESERVAS_PATH || 'http://localhost:';
 
 
 
@@ -20,21 +20,20 @@ const deleteHeader = {}
 
 const getMethod = (endpoint) => {
     return new Promise((resolve,reject) => {
-        http.get(enviroment_host + enviroment_port + endpoint).once('response', (response) => 
+        http.get(enviroment_reservas_path + enviroment_reservas_port + endpoint).once('response', (response) => 
         {
-
             response.once('data', (data) => {
                 respuesta = data.toString();
-                if(response.statusCode == 404)
-                    reject(respuesta)
-                else
+                if(response.statusCode == 200)
                     resolve(respuesta)
+                else
+                    reject(respuesta)
             })
             response.once('error', () =>{
-                reject('Error en la respuesta del server de reservas')
+                reject('ERROR: en la respuesta del server de reservas')
             })
-        });
-    })  
+        }).once('error', (err) => { reject("ERROR: no responde el servidor de reservas")});
+    }) 
 }
 
 //METODO POST
@@ -45,8 +44,8 @@ const getMethod = (endpoint) => {
 const putMethod = (endpoint,body) => {
     return new Promise((resolve,reject) => {
         const options = {
-            port: enviroment_port,
-            hostname: '127.0.0.1',
+            port: enviroment_reservas_port,
+            hostname: enviroment_reservas_path,
             method: 'PUT',
             path: endpoint,
             headers:
@@ -60,18 +59,18 @@ const putMethod = (endpoint,body) => {
 
             response.once('data', (data) => {
                 respuesta = data.toString();
-                if(response.statusCode == 404)
-                    reject(respuesta)
-                else
+                if(response.statusCode == 200)
                     resolve(respuesta)
+                else
+                    reject(respuesta)
             })
-            response.once('error', () =>{
-                reject('Error en la respuesta del server de reservas')
+            response.once('error', (err) =>{
+                reject('ERROR: en la respuesta del server de reservas')
             })
         });
 
         request.write(body);
-        request.on('error', (err) => reject('Error en el put de reservas ' + err))
+        request.on('error', (err) => reject('ERROR: el servidor de reservas no responde' + err))
         request.end()
     }) 
 }

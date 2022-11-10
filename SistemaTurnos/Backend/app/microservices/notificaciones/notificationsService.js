@@ -46,9 +46,10 @@ const confirmationEmail = (url,body) => {
     
     const req = https.request(options, (response) => {
     
-      if(response.statusCode == 202)
+      if(response.statusCode == 202 || response.statusCode == 200)
         res('Confirmacion enviada correctamente')
-
+      else
+        rej('ERROR en la confirmacion de mail')
       response.once('data', (data) => {
           respuesta = data.toString();
           console.log(respuesta)

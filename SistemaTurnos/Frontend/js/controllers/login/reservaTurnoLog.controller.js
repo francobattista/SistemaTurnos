@@ -2,7 +2,7 @@
 
 //Eso se puede hacer con webpack, y me ahorra tener que pasar las vistas como string aca, es decir, podria usar un arch html
 
-import { getTurnosByParam } from "../services/reservasService.js";
+import { getTurnosByParam } from "../../services/reservasService.js";
 
 export var dataReserva;
 

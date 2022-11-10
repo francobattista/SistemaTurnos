@@ -11,13 +11,17 @@ export default () => {
 
     const view = `
 
-        <h1>HOME CONTROLLER</h1>
-
-
-        <iframe id="map" width="100%" height="400" frameborder="0"></iframe>
+        <h1 id="h1Princ">El Potrero de Coccaro</h1>
+        <div id="divMapa">
+            <iframe id="map" width="70%" height="600" frameborder="0";></iframe>
+        </div>
     `;
     const divElement = document.createElement("div");
     divElement.innerHTML = view;
+
+
+
+
     
     const addOrDeleteSucursal = () =>{
         getMapMarkers().then((sucursalesDibujadas) => 
@@ -72,7 +76,7 @@ export default () => {
     const getSucursalesM = () => {
         getSucursales().then((data) => 
         {
-            sucursales = data.sucursales
+            sucursales = data
             getBaseMapHome();
         }
         )

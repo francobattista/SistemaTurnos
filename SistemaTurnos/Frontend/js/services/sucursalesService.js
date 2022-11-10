@@ -11,7 +11,7 @@
 const getSucursales = () => 
 { 
 
-    return new Promise((res,rej) => {
+    return new Promise((response,reject) => {
 
         let config = {
             method: 'GET',
@@ -19,13 +19,19 @@ const getSucursales = () =>
         };
     
         fetch('http://localhost:3030/api/sucursales', config)
-        .then((response) => {   //Tipo HTTPResponse: {status: algo; code:200 ... etc}
-            console.log(response)
-                response.json().then( //Desencapsula el body, y lo transforma en JSON.
-                    (data) => {console.log(data);res(JSON.parse(data))});
+        .then((res) => {   //Tipo HTTPResponse: {status: algo; code:200 ... etc}
+                res.json().then( //Desencapsula el body, y lo transforma en JSON.
+                    (data) => 
+                    {
+                        console.log(res)
+                    if(res.status != 200)
+                        reject(JSON.parse(data))
+                    else
+                        response(JSON.parse(data))
+                    });
             }).catch( (err) => 
             {
-                rej(err)
+                reject(err)
             })
     }
     )
@@ -39,13 +45,19 @@ const getSucursal = (idSucursal) =>
         //headers: new Headers({ 'Content-type': 'application/json'}) OJO CON ESTE HEADER QUE ME TIRA DUPLICADA LA REQUEST
     };
 
-    return new Promise((res,rej) => {
+    return new Promise((response,reject) => {
 
     fetch('http://localhost:3030/api/sucursales/' + String(idSucursal), config)
-    .then(response => {   
-        response.json().then((data) => res(JSON.parse(data)))
+    .then(res => {   
+        res.json().then((data) => 
+        {
+            if(res.status != 200)
+                reject(JSON.parse(data))
+            else
+                response(JSON.parse(data))
+        })
     }).catch((err) => {
-            rej(err)
+            reject(err)
     })})
 
 

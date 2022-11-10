@@ -9,8 +9,8 @@ const { createRecordatorio } = require('./recordatorios/recordatorios.js')
 
 env.config();
 
-const port = process.env.portReservas || 8080
-const portNotificaciones = process.env.portNotificaciones || 8070
+const envirioment_port_reservas = process.env.RESERVAS_PORT || 8080
+
 
 const responseHeaders = {
     'Access-Control-Allow-Origin': '*', 
@@ -28,12 +28,11 @@ const bodyParser = (req,res) =>{
             body += c;
         })
         req.on('end', () => {
-            console.log("end")
             resolve(body)
         })
 
-        req.on('error',() => {
-            reject();
+        req.on('error',(err) => {
+            reject('ERROR: en el body enviado al servidor de reservas');
         })
     })
 }
@@ -86,15 +85,13 @@ const processRequestPut = (req,res,url) => {
                             console.log("a")
                             let ok = false;
                             let reservas = JSON.parse(fs.readFileSync('./reservas.json').toString())
-                            reservas['reservas'].map((element) => { //nO ES NECESARIO Q SEA UN MAP
+                            reservas.map((element) => { //nO ES NECESARIO Q SEA UN MAP
                                 if(element.idReserva == idReserva)
                                     if(element.userId == "-1" && element.status == '0') 
                                     {
-                                        //if(element)    
-                                            element.userId = String(req.body.userId);
-                                            element.status = "1"
-                                            //fecha = new Date(element.dateTime);
-                                            ok = true;
+                                        element.userId = String(req.body.userId);
+                                        element.status = "1"
+                                        ok = true;
                                     }
                             })
                             if(ok)
@@ -107,9 +104,7 @@ const processRequestPut = (req,res,url) => {
                                     console.log(idReserva)
                                     let ok = false;
                                     let reservas = JSON.parse(fs.readFileSync('./reservas.json').toString())
-                                    let fecha;
-                                    let sucursal;
-                                    reservas['reservas'].map((element) => { //nO ES NECESARIO Q SEA UN MAP
+                                    reservas.map((element) => { //nO ES NECESARIO Q SEA UN MAP
                                         if(element.idReserva == idReserva)
                                             if(element.status != "2") 
                                             {
@@ -125,7 +120,7 @@ const processRequestPut = (req,res,url) => {
                                 else
                                     console.log("YA LO CONFIRMO EL TURNO!")//createErrorResponse(req,'El turno no se ha podido reservar!') NO PERDIO EL TURNO!
                                      
-                                }, 5000);
+                                }, 60000);
                                 return;
                             }
                                 createErrorResponse(res,'ERROR : No se pudo reservar el turno porque no esta disponible!')
@@ -147,7 +142,7 @@ const processRequestPut = (req,res,url) => {
                             let ok = false;
                             let reservas = JSON.parse(fs.readFileSync('./reservas.json').toString())
                             let fecha;
-                            reservas['reservas'].map((element) => 
+                            reservas.map((element) => 
                             { //nO ES NECESARIO Q SEA UN MAP
                                 if(element.idReserva == idReserva)
                                     if(element.userId == req.body.userId && element.status == 1) //la primer parte del if la tengo q mover mas arriba, para q no analice si viene un id vacio
@@ -188,7 +183,7 @@ const processRequestPut = (req,res,url) => {
             {
                 let ok = false;
                 let reservas = JSON.parse(fs.readFileSync('./reservas.json').toString())
-                reservas['reservas'].map((element) => { //deberia usar mejor el map jeje, lo estoy suando mal
+                reservas.map((element) => { //deberia usar mejor el map jeje, lo estoy suando mal
                     if(element.idReserva == slug)
                     {
                         element.userId = "";
@@ -229,7 +224,7 @@ const processRequestGet = (req,res,url) =>
         if(Number(slug)) //Es correcto el slug
         {
             reservas = JSON.parse(fs.readFileSync('./reservas.json').toString())   
-            respuesta = reservas.reservas.filter((f) => {return f.idReserva == slug});
+            respuesta = reservas.filter((f) => {return f.idReserva == slug});
             res.writeHead(codes.statusOk,responseHeaders)
             res.end(JSON.stringify(respuesta)) 
             return;
@@ -257,7 +252,7 @@ const processRequestGet = (req,res,url) =>
                 filtros.push({filtro:'dateTime',valor:queryParams.get('dateTime')})
             if(queryParams.has('branchId') && queryParams.get('idSucbranchIdursal')!='') 
                 filtros.push({filtro:'branchId',valor:queryParams.get('branchId')})
-            let respuesta = reservas.reservas;
+            let respuesta = reservas;
             filtros.forEach((filtro) => {
                 
                 respuesta = respuesta.filter((r) => {
@@ -315,8 +310,8 @@ const server = http.createServer( (request,response) =>
     //Si las solicitudes llegan a paths erroneos devolver codigos de error
 });
 
-server.listen( port, (req,res) => {
-    console.log(`SERVIDOR DE RESERVAS: Levantado en puerto ${port}`)
+server.listen( envirioment_port_reservas, (req,res) => {
+    console.log(`SERVIDOR DE RESERVAS: Levantado en puerto ${envirioment_port_reservas}`)
 } );
 
 

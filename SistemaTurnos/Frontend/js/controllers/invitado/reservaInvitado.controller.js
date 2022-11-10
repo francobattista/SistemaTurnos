@@ -1,7 +1,7 @@
 // import html from ... login.html
 
-import { getTurnosByParam } from "../services/reservasService.js";
-import { getSucursales } from "../services/sucursalesService.js";
+import { getTurnosByParam } from "../../services/reservasService.js";
+import { getSucursales } from "../../services/sucursalesService.js";
 
 //Eso se puede hacer con webpack, y me ahorra tener que pasar las vistas como string aca, es decir, podria usar un arch html
 
@@ -16,7 +16,7 @@ export default () => {
 
           <select id="sucursalesId" name="select">
           </select>
-
+        
           <div class="calendar">
             <div class="calendar__info">
                 <div class="calendar__prev" id="prev-month">&#9664;</div>
@@ -39,9 +39,18 @@ export default () => {
           </div>
 
   `;
-      const divElement = document.createElement("div");
-      divElement.innerHTML = view;
+ 
+    const divElement = document.createElement("div");
+    divElement.innerHTML = view;
 
+    divElement.style
+    ['display'] = "flex";
+            
+    divElement.style
+    ['align-items'] = "center";
+            
+    divElement.style
+    ['justify-content'] = "auto"; 
 
 
 
@@ -61,6 +70,7 @@ export default () => {
       let mesHTML = divElement.querySelector('#month');
       let yearHTML = divElement.querySelector('#year');
 
+      let initDay;
       let prevButtonHTML = divElement.querySelector('#prev-month');
       let nextButtonHTML = divElement.querySelector('#next-month');
 
@@ -78,7 +88,12 @@ export default () => {
       const agregaListener = () =>
       {
 
-          for(let index = fechaDeHoy.getDate(); index < fechasHTML.children.length; index++) {
+        if(fechaDeHoy.getMonth() == mesActualNumber)
+            initDay=fechaDeHoy.getDate();
+        else
+            initDay = startDay(yearActual,mesActualNumber);
+        console.log(initDay)
+          for(let index = initDay; index < fechasHTML.children.length; index++) {
               const element = fechasHTML.children[index];
               element.addEventListener('click', (event) => 
               {
@@ -93,7 +108,7 @@ export default () => {
                       }
                       else
                           alert("No hay turnos para la fecha ingresada")
-                  })
+                  }).catch((err) => console.log(err) )
               })
 
               element.addEventListener('mouseover', (event) => {
@@ -114,7 +129,8 @@ export default () => {
       const getSucursalesM = () => {
         getSucursales().then((data) => 
         {
-            sucursales = data.sucursales
+            console.log(data)
+            sucursales = data
             sucursales.forEach(element => {
               let op = document.createElement('option');
               op.value = element.id;
@@ -122,7 +138,7 @@ export default () => {
               sucursalesId.appendChild(op);
             });
         }
-        )
+        ).catch((err) => alert("ERROR: No se pueden traer las sucursales"))
       }
 
 
@@ -145,6 +161,7 @@ export default () => {
               fechasHTML.innerHTML += ` <div class="calendar__date calendar__item calendar__last-days">
               ${i}
               </div>`;
+
           }
           else
           {

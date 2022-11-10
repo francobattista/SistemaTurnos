@@ -4,8 +4,8 @@ const fs = require('fs')
 
 
 //Configuraciones del GATEWAY en archivo .env
-const port = process.env.PORT || 8090
-const host = process.env.HOST || '0.0.0.0'
+const enviroment_sucursales_port = process.env.SUCURSALES_PORT || 8090
+const enviroment_sucursales_path = process.env.SUCURSALES_PATH || '0.0.0.0'
 
 const responseHeaders = {
     'Access-Control-Allow-Origin': '*', 
@@ -43,7 +43,7 @@ const processRequestGet = (req,res,url) =>
     if(idSucursal)
     {
         let sucursales = JSON.parse(fs.readFileSync('./sucursales.json').toString())
-        respuesta = sucursales.sucursales.filter((f) => {return f.id == idSucursal});
+        respuesta = sucursales.filter((f) => {return f.id == idSucursal});
     }
     else
         respuesta =JSON.parse(fs.readFileSync('./sucursales.json').toString()); //Lo parseo igual, porque sino abajo (que tengo toda la rta junta), me va a ahcer stringify de algo que no esta parceado y lo codifica mal
@@ -91,6 +91,6 @@ const createOkResponse = (res,data) => {
 }
 
 
-server.listen( port, (req,res) => {
-    console.log(`SERVIDOR DE SUCURSALES: Levantado en puerto ${port}`)
+server.listen( enviroment_sucursales_port, (req,res) => {
+    console.log(`SERVIDOR DE SUCURSALES: Levantado en puerto ${enviroment_sucursales_port}`)
 } )

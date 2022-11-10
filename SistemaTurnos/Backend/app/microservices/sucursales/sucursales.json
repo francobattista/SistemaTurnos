@@ -1,25 +1,23 @@
 
-{
-    "sucursales":
     [ 
         {
             "id": 1,
             "lat": -38.029816,
             "lng":-57.565525,
-            "name":"SUCURSAL1"
+            "name":"SUCURSAL CATONIO"
         },
         {
             "id": 2,
             "lat": -38.053853,
             "lng":-57.596898,
-            "name":"SUCURSAL2"
+            "name":"SUCURSAL LA VERDE"
         },
         {
             "id": 3,
             "lat": -37.950591,
             "lng":-57.556892,
-            "name":"SUCURSAL3"
+            "name":"SUCURSAL ONCE UNIDOS"
         }
     ]
       
-}
+

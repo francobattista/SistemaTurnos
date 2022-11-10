@@ -6,9 +6,10 @@
 export default () => {
     const view = `
 
-    <div class="container login-container">
-      <div class="row">
-          <div class="col-md-6 login-form-1">
+
+    <div class="container login-container" style=" display: flex;width: 100%; height: 100%;">
+      <div class="row" style="width: 100%; justify-content: center">
+          <div style="background-color:white;" class="col-md-6 login-form-1">
               <h3>El Potrero de Coccaro</h3>
               <form id="form">
                   <div class="form-group">
