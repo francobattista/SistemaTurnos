@@ -143,7 +143,7 @@ const server = http.createServer( (req,res) =>
 
 const createErrorResponse = (res,message) =>{
     console.log("Create error response:")
-    console.log(message)
+    console.log(JSON.stringify({message: message}))
     res.writeHead(codes.notFound,responseHeaders);
     res.end(JSON.stringify({message: message}))
 

@@ -21,13 +21,11 @@ const getSucursales = () =>
         fetch('http://localhost:3030/api/sucursales', config)
         .then((res) => {   //Tipo HTTPResponse: {status: algo; code:200 ... etc}
                 res.json().then( //Desencapsula el body, y lo transforma en JSON.
-                    (data) => 
-                    {
-                        console.log(res)
-                    if(res.status != 200)
-                        reject(JSON.parse(data))
-                    else
+                    (data) => {
+                    if(res.status == 200)
                         response(JSON.parse(data))
+                    else
+                        reject(data)
                     });
             }).catch( (err) => 
             {
@@ -51,10 +49,10 @@ const getSucursal = (idSucursal) =>
     .then(res => {   
         res.json().then((data) => 
         {
-            if(res.status != 200)
-                reject(JSON.parse(data))
-            else
+            if(res.status == 200)
                 response(JSON.parse(data))
+            else
+                reject((data))
         })
     }).catch((err) => {
             reject(err)
