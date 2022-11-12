@@ -43,3 +43,15 @@ Podemos crear un mapa personalizado, tirando el get a https://cartes.io/api/maps
 Con ese interactuamos. Se necesitan los header. 
 
 Creo que para mostrarlo solo basta con el iframe y desp para los post de las sucursales tirandole post a el enpoint
+
+
+
+
+/***********************************************************************************************************************
+
+
+JWT Y AUTH0
+
+
+
+Client id -> identifica la aplicacion dentro del auth0 -> brfUS53V0OIKebXgwI9DyuKth9PZtXjt - El potrero de coccaro  

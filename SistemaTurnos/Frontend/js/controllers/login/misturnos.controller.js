@@ -1,4 +1,4 @@
-import { getTurnosByParam } from "../services/reservasService.js";
+import { getTurnosByParamAuth } from "../../services/reservasService.js";
 
 export default (data) => {
     console.log(data)
@@ -8,7 +8,7 @@ export default (data) => {
     const divElement = document.createElement("div");
     divElement.innerHTML = view;
 
-    getTurnosByParam(1,'','').then((turnos) => {
+    getTurnosByParamAuth(1,'','').then((turnos) => {
         let turnosDiv = document.createElement('div')
         if(turnos.length > 0)
             turnos.forEach(element => {   

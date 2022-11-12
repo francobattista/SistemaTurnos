@@ -20,6 +20,7 @@ const router = (data,route) => { //Recibe data y una ruta a donde debe direccion
    switch(route){
       case '#/login': return content.appendChild(pages.login());
       case '#/consultafechainvitado' : return content.append(pages.fechasinvitado(data))
+      case '#/consultafechalog' : return content.append(pages.fechasLog(data))
       case '#/reservaturnoslog' :content.append(pages.navbar()); return content.append(pages.reservaTurnoLog())
       case '#/home' : content.append(pages.navbar()); return content.append(pages.home())
       case '#/reservainvitado' : content.append(pages.home()); return content.append(pages.reservaInvitado())

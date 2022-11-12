@@ -2,76 +2,96 @@
 // o sin token. O la idea es duplicar el api y que ahora siempre q el usuario este logueado se apunte aca?
 
 //TODOS ESTOS RECURSOS RECIBEN EL TOKEN Y LO VALIDA
-const enviroment_gatway_host = process.env.GATEWAY_AUTH_HOST;
-const enviroment_gatway_port = process.env.GATEWAY_AUTH_PORT;
+
 
 const env = require('dotenv');
 const express = require('express');
-const { json } = require('express/lib/response');
+const app = express();
+const { auth, requiredScopes } = require('express-oauth2-jwt-bearer');
+
+const responseHeaders = {
+    'Access-Control-Allow-Origin': '*', 
+    'Access-Control-Allow-Methods': 'POST, GET, PUT, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Content-Type': 'application/json'
+}
 
 env.config();
 
-const app = express();
+const enviroment_gatway_host = process.env.GATEWAY_AUTH_HOST;
+const enviroment_gatway_port = process.env.GATEWAY_AUTH_PORT;
 
-app.set('name','ElPotreroDeCoccaro')
+app.set('name','ElPotreroDeCoccaro');
 
-const login = (req,res,next) => //VALIDACION DEL JWT CON AUTH0
-{
 
-    
-    authController.validaToken();
+const checkJwt = auth({
+    audience: 'R7MwFIXgCMgvblhVY6aGMLEpZ769rfpr',
+    issuerBaseURL: `https://dev-enjgvjw7srdpn1x1.us.auth0.com/`,
+});
 
-    console.log("login")
-    //if req.url == login o singin que los mande directo y que no valide token pq justamente se estan lgoenadp
-    if(true) 
-        next();
+
+const middlewareEntrada = (req,res,next) =>{
+    console.log("entrada");
+    next();
 }
 
-app.use(json())
+const middlewareSalida = (err,req,res,next) =>{
+    console.log(err.status);
+    res.writeHead(err.status,responseHeaders);
+    res.end(JSON.stringify({message:"error (por ahi por no autorizado, o por ahi pq le pinto jeje)"}))
+}
 
-app.use(login)
+app.use(middlewareEntrada);
+
 
 //SUCURSALES
-app.get('/api/sucursales/:branchId', (request,response) => { //Sucursal en especifico
-    
-
+app.get('/api/sucursales/:branchId', checkJwt, (request,response) => { //Sucursal en especifico
+    response.writeHead(responseHeaders);
+    response.status(200).json({
+        message: 'Pediste las sucursales, logeado correctamente!'
+    })
 })
 
-app.get('/api/sucursales', (request,response) => { //Todas las sucursales
+app.get('/api/sucursales', checkJwt, (request,response) => { //Todas las sucursales
+    console.log(request.headers)
+    response.writeHead(200,responseHeaders);
+    response.end(JSON.stringify({message: 'Pediste las sucursales, logeado correctamente!'}));
 
 })
 
 //NOTIFICACIONES
-app.post('/api/notificacion', (request,response) => { //Envia notificacion
+app.post('/api/notificacion', checkJwt, (request,response) => { //Envia notificacion
 
 })
 
 //RESERVAS
-app.get('/api/reservas/:idReserva', (request,response) => { //Get de una reserva en especifico
+app.get('/api/reservas/:idReserva', checkJwt, (request,response) => { //Get de una reserva en especifico
 
 })
 
-app.get('/api/reservas', (request,response) => { //Get reservas con filtros
+app.get('/api/reservas',checkJwt, (request,response) => { //Get reservas con filtros
 
 })
 
-app.delete('/api/reservas/:idReserva', (request,response) => { //Baja de una reserva
+app.delete('/api/reservas/:idReserva', checkJwt, (request,response) => { //Baja de una reserva
    
 
 })
 
-app.put('/api/reservas/solicitar/:idReserva', (request,response) => { //Solicitud de reserva
+app.put('/api/reservas/solicitar/:idReserva', checkJwt, (request,response) => { //Solicitud de reserva
    
 
 })
 
-app.put('/api/reservas/confirmar/:idReserva', (request,response) => { //Confirmacion de una reserva
+app.put('/api/reservas/confirmar/:idReserva', checkJwt,  (request,response) => { //Confirmacion de una reserva
    
 
 })
 
 
+app.use(middlewareSalida);
 
+/*
 //LOGIN
 app.post('/api/signup', (request,response) => { //Confirmacion de una reserva
     
@@ -92,7 +112,7 @@ app.post('/api/login', (request,response) => { //Confirmacion de una reserva
     createOkResponse(response,data)
 })
 
-
+*/
 
 //RUTAS
 
