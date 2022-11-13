@@ -6,10 +6,13 @@ const router = (data,route) => { //Recibe data y una ruta a donde debe direccion
 
 
    //Chequeo si puede ingresar a la ruta.
-   console.log(route)
+   console.log(data)
    if(route != '#/login' && route != '#/reservaInvitado') //Estas son rutas que no necesitan ser validadas, cualquier usuario las puede acceder
       console.log("no tiene que validar")
    else
+   {
+      
+   }
       //if(!validaRutas()) Si da falso, no pudo validar las rutas, entonces te manda al login
       //{
       //   window.location.hash = '/#/login'

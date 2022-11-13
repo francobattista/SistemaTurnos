@@ -101,20 +101,23 @@ export default () => {
               {
                   let selectedDay = new Date(2022,mesActualNumber,Number(event.target.innerHTML))
                   //getReservas
+                  console.log("por");
                   getTurnosByParamAuth('-1',selectedDay.toISOString(),sucursalesId.value).then((r) => {
                     console.log(r)
                       if(r.length>0)  
                       {
-                          dataReservaInvitado = r;
+                        console.log(r.length)
+                          dataReservaLog = r;
                           window.location.hash = '#/consultafechalog';
                       }
                       else
                           alert("No hay turnos para la fecha ingresada")
-                  }).catch((err,auth) => {
-                    if(auth)
+                  }).catch((err) => {
+                    console.log(err)
+                    if(err.auth)
                         userUnauthorized();
                     else
-                        alert("No se pudieron traer las sucursales")
+                        alert("No se pudieron traer los turnos")
                 })
               })
 
@@ -136,17 +139,22 @@ export default () => {
       const getSucursalesM = () => {
         getSucursalesAuth().then((data) => 
         {
+            sucursales = []
             console.log(data)
             sucursales = data
-            sucursales.forEach(element => {
-              let op = document.createElement('option');
-              op.value = element.id;
-              op.text = element.name;
-              sucursalesId.appendChild(op);
-            });
+            if(sucursales.length)
+            {
+                sucursales.forEach(element => {
+                  let op = document.createElement('option');
+                  op.value = element.id;
+                  op.text = element.name;
+                  sucursalesId.appendChild(op);
+                });
+            }
         }
-        ).catch((err,auth) => { 
-            if(auth)
+        ).catch((err) => { 
+            console.log(err)
+            if(err.auth)
                 userUnauthorized();
             else
                 alert("No se pudieron traer las sucursales")

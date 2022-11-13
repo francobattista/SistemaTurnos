@@ -3,9 +3,6 @@
 
 
 
-const getHeadersAuth = {
-    'Authorization': 'Bearer ' + window.sessionStorage.getItem('token')   
-}
 
 
 
@@ -68,21 +65,30 @@ const getSucursal = (idSucursal) =>
 const getSucursalesAuth = () => {
     
     return new Promise((response,reject) => {
+
+        const getHeadersAuth={
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + window.sessionStorage.getItem('token')   
+        }
     
         let config = {
             method: 'GET',
             headers: getHeadersAuth
         };
-        
+        console.log(getHeadersAuth)
         fetch('http://localhost:3020/api/sucursales', config)
         .then((res) => {   
                 res.json().then( 
                     (data) => {
+                        console.log(res.status)
                     if(res.status == 200)
                         response(JSON.parse(data))
                     else
                         if(res.status == 401)
+                        {
+                            data.auth = 1
                             reject(data,1)
+                        }
                         else
                             reject(data)
                     });
@@ -95,6 +101,11 @@ const getSucursalesAuth = () => {
 
 const getSucursalAuth = (idSucursal) => 
 { 
+    const getHeadersAuth={
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + window.sessionStorage.getItem('token')   
+    }
+
     let config = {
         method: 'GET',
         headers: getHeadersAuth
@@ -108,10 +119,13 @@ const getSucursalAuth = (idSucursal) =>
         res.json().then((data) => 
         {
             if(res.status == 200)
-                response(JSON.parse(data))
+                response(data)
             else
                 if(res.status == 401)
+                {
+                    data.auth = 1
                     reject(data,1)
+                }
                 else
                     reject(data)
             })

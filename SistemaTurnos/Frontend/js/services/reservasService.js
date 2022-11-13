@@ -20,7 +20,7 @@ const headerDelete = {
 
 }
 
-
+/*
 const headerPostAuth = {
 
 }
@@ -32,7 +32,6 @@ const headerGetAuth = {
 
 const headerPutAuth = {
     'Content-Type': 'application/json',
-    'Authorization': 'Bearer ' + window.sessionStorage.getItem('token')   
 }
 
 
@@ -40,7 +39,7 @@ const headerDeleteAuth = {
 
 }
 
-
+*/
 
 
 //--------------------------INVITADO-------------------------------------------
@@ -184,7 +183,11 @@ const altaReservaAuth = (idReserva,email,userId) => {
         {
             rej("Error, parametros erroneos")
         }
-
+        const headerPutAuth={
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + window.sessionStorage.getItem('token')   
+        }
+        
         let config = {
             method: 'PUT',
             headers: headerPutAuth,
@@ -200,11 +203,17 @@ const altaReservaAuth = (idReserva,email,userId) => {
                 rej("No se ha podido reservar el turno")
             response.json().then((data) => 
             {
-                if(res.status != 200)
-                    reject(JSON.parse(data))
-                else
+                if(res.status == 200)
                     response(JSON.parse(data))
-            })
+                else
+                    if(res.status == 401)
+                    {
+                        data.auth = 1
+                        reject(data)
+                    }
+                    else
+                        reject(data)
+                })
         }).catch((err) =>{ reject(err); } )
     })
 }
@@ -215,6 +224,10 @@ const confirmaReservaAuth = (idReserva,email,userId) => {
         if(!idReserva || !email)
         {
             rej("Error, parametros erroneos")
+        }
+        const headerPutAuth={
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + window.sessionStorage.getItem('token')   
         }
 
         let config = {
@@ -232,11 +245,17 @@ const confirmaReservaAuth = (idReserva,email,userId) => {
         {
             res.json().then((data) => 
             {
-                if(res.status != 200)
-                    reject(JSON.parse(data))
-                else
+                if(res.status == 200)
                     response(JSON.parse(data))
-            })
+                else
+                    if(res.status == 401)
+                    {
+                        data.auth = 1
+                        reject(data)
+                    }
+                    else
+                        reject(data)
+                })
         }).catch((err) =>{ reject(err); } )
     })
 }
@@ -249,7 +268,13 @@ const confirmaReservaAuth = (idReserva,email,userId) => {
 //DELETE
 
 
-const bajaReservaAuth = (idReserva) => { 
+const bajaReservaAuth = (idReserva) => {
+    
+    const headerPutAuth={
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + window.sessionStorage.getItem('token')   
+    }
+    
     let config = {
         method: 'PUT',
         headers: headerPutAuth,
@@ -265,7 +290,10 @@ return new Promise((response,reject) =>
                 response(JSON.parse(data))
             else
                 if(res.status == 401)
-                    reject(data,1)
+                {
+                    data.auth = 1
+                    reject(data)
+                }
                 else
                     reject(data)
             }))
@@ -281,6 +309,12 @@ return new Promise((response,reject) =>
 //Trae una sola reserva en base de una idReserva
 const getReservaAuth = (idReserva) =>{
 
+    const headerPutAuth={
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + window.sessionStorage.getItem('token')   
+    }
+    
+
     let config = {
         method: 'GET',
         headers: headerPutAuth,
@@ -294,7 +328,10 @@ return new Promise((response,reject) => {
             response(JSON.parse(data))
         else
             if(res.status == 401)
-                reject(data,1)
+            {
+                data.auth = 1;
+                reject(data)
+            }
             else
                 reject(data)
         }))
@@ -309,6 +346,11 @@ return new Promise((response,reject) => {
 const getTurnosByParamAuth = (idUsuario, fecha, idSucursal) =>
 {
 
+    const headerPutAuth={
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + window.sessionStorage.getItem('token')   
+    }
+    console.log("a");
     let config = {
         method: 'GET',
         headers: headerPutAuth,
@@ -317,7 +359,8 @@ const getTurnosByParamAuth = (idUsuario, fecha, idSucursal) =>
     let queryParams = new URLSearchParams();
     queryParams.set('userId',String(idUsuario))
     queryParams.set('dateTime', fecha)
-    queryParams.set('branchId',String(idSucursal))
+
+    if(idSucursal) queryParams.set('branchId',String(idSucursal))
     return new Promise((response,reject) => {
  
         fetch("http://localhost:3020/api/reservas?" + queryParams.toString(),config)
@@ -326,11 +369,14 @@ const getTurnosByParamAuth = (idUsuario, fecha, idSucursal) =>
                 response(JSON.parse(data))
             else
                 if(res.status == 401)
-                    reject(data,1)
+                {
+                    data.auth = 1;
+                    reject(data);
+                }
                 else
                     reject(data)
             }))
-        .catch((err) =>{ reject(err); } )
+        .catch((err) =>{ console.log(err);reject(err); } )
     })
 }
 

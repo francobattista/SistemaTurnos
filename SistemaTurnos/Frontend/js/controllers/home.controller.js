@@ -79,7 +79,7 @@ export default () => {
             sucursales = data
             getBaseMapHome();
         }
-        ).catch((err) => {console.log("Error, refresque la pagina")})
+        ).catch((err) => {console.log("Error pidiendo las sucursales")})
     }
 
 

@@ -14,9 +14,10 @@ export default () => {
 
 
 
+        <input type="button" id="btnLoginInv" value="LOG IN">
           <select id="sucursalesId" name="select">
           </select>
-        
+
           <div class="calendar">
             <div class="calendar__info">
                 <div class="calendar__prev" id="prev-month">&#9664;</div>
@@ -34,7 +35,8 @@ export default () => {
                 <div class="calendar__day calendar__item">Sab</div>
                 <div class="calendar__day calendar__item">Dom</div>
             </div>
-        
+
+
             <div class="calendar__dates" id="fechas"></div>
           </div>
 
@@ -84,7 +86,10 @@ export default () => {
       //Otras declaraciones
       let sucursales;
       const sucursalesId = divElement.querySelector('#sucursalesId');
-
+      const btnLoginInv =divElement.querySelector('#btnLoginInv');
+      btnLoginInv.addEventListener(('click'),(event) => {
+        window.location.hash = '#/login'
+      })
       const agregaListener = () =>
       {
 

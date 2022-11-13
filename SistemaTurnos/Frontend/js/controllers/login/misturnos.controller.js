@@ -13,8 +13,14 @@ export default (data) => {
         if(turnos.length > 0)
             turnos.forEach(element => {   
                 let turno = document.createElement('div');
-                turno.innerHTML = new Date(element.dateTime).toLocaleString()
+                let cancel = document.createElement('a');
+                cancel.addEventListener('click',(event) => {
+                    console.log(event.target.parentElement.body)
+                })
+                cancel.innerHTML = "CANCELAR TURNO"
+                turno.innerHTML = new Date(element.dateTime).toLocaleString() + ' '
                 turno.body = element;
+                turno.appendChild(cancel)
                 turnosDiv.appendChild(turno)
             });
         else

@@ -1,3 +1,4 @@
+import { createAuthClientLogOut } from "../services/auth.service.js";
 
 export default () => {
     const view = `
@@ -9,11 +10,12 @@ export default () => {
         <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0" id="lista">
         <li><a href="#/home" class="nav-link px-2 link-secondary">Inicio</a></li>
         <li><a href="#/misturnos" class="nav-link px-2 link-dark">Mis turnos</a></li>
-        <li><a href="#/account" class="nav-link px-2 link-dark">Mi cuenta</a></li>
         <li><a href="#/reservaturnoslog" class="nav-link px-2 link-dark">Reserva</a></li>
-        <li><a href="#/help" class="nav-link px-2 link-dark">Ayuda</a></li>
         </ul>
         
+        <div id="btns" class="form-group">
+            <input type="button" id="btnLogout" value="LOGOUT" />
+        </div>
         <div class="col-md-3 text-end">
 
         </div>
@@ -21,6 +23,9 @@ export default () => {
     `;
     const divElement = document.createElement("div");
     divElement.innerHTML = view;
+
+
+    createAuthClientLogOut(divElement)
 
     return divElement;
 }

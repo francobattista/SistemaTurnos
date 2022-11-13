@@ -44,6 +44,8 @@ import {
     const userUnauthorized = () => {
       window.location.hash = '#/login'
     }
+
+
     const preparaFechas = (fecha) => {
       fecha.style["display"] = "flex";
   
@@ -69,8 +71,8 @@ import {
                     .then((r) => {
                       alert("Reserva confirmada con exito!");
                     })
-                    .catch((err,auth) => {
-                      if(auth)
+                    .catch((err) => {
+                      if(err.auth)
                           userUnauthorized();
                       else
                           alert("Error en la confirmacion")
@@ -80,15 +82,15 @@ import {
                 window.location.hash = "#/reservaturnoslog";
               });
             })
-            .catch((err,auth) => {
-              if(auth)
+            .catch((err) => {
+              if(err.auth)
                   userUnauthorized();
               else
                   alert("Error en la reserva")
           });
         } else alert("parametros incorrectos");
       });
-  
+      console.log("as")
       fecha.addEventListener("mouseover", (event) => {
         fecha.style["background-color"] = "#7ca3b9";
         fecha.style["border-radius"] = "10px";
@@ -106,6 +108,7 @@ import {
     backBtnF.addEventListener("click", () => {
       window.location.hash = "#/reservaturnoslog";
     });
+    
     const inputEmail = divElement.querySelector("#inputEmail");
     const horariosReserva = document.createElement("div");
     divElement.appendChild(horariosReserva);
