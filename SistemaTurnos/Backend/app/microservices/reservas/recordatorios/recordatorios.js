@@ -24,11 +24,13 @@ const createRecordatorio = (datosRecordatorio, reservaDate) =>{
     if(diferencia > 24*3600*1000)
       if(datosRecordatorio.userId != 0)
         timeout[datosRecordatorio.userId] = (setTimeout(() => {
+          console.log("recordar")
           reservasNotificationService.createNotification(datosRecordatorio.email, 'RECORDATORIO DE TURNO',`Mi loko, recorda que dentro de 24hs tenes turno en el #PotreroDeCoccaro `)
         },cuandoAviso));  
       else
       {
         setTimeout(() => {
+          console.log("recor")
           reservasNotificationService.createNotification(datosRecordatorio.email, 'RECORDATORIO DE TURNO',`Mi loko, recorda que dentro de 24hs tenes turno en el #PotreroDeCoccaro `)
         },cuandoAviso);  
       }
@@ -54,7 +56,7 @@ const bajaRecordatorio = (datos) => {
 
 
 
-module.exports = { createRecordatorio:createRecordatorio }
+module.exports = { createRecordatorio:createRecordatorio, bajaRecordatorio: bajaRecordatorio }
 
 
 

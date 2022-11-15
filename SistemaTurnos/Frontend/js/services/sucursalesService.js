@@ -1,35 +1,33 @@
 
-
-
-
-
-
-
-
 //---------------------------------INVITADO-------------------------------
 
 const getSucursales = () => 
 { 
 
-    return new Promise((response,reject) => {
+    return new Promise((res,rej) => {
+        const getHeaders={
+            'Content-Type': 'application/json',
+        }
 
         let config = {
             method: 'GET',
-            //headers: new Headers({ 'Content-type': 'application/json'}) OJO CON ESTE HEADER QUE ME TIRA DUPLICADA LA REQUEST
+            headers: getHeaders
         };
     
         fetch('http://localhost:3030/api/sucursales', config)
-        .then((res) => {   //Tipo HTTPResponse: {status: algo; code:200 ... etc}
-                res.json().then( //Desencapsula el body, y lo transforma en JSON.
+        .then((response) => {   //Tipo HTTPResponse: {status: algo; code:200 ... etc}
+            response.json().then( //Desencapsula el body, y lo transforma en JSON.
                     (data) => {
-                    if(res.status == 200)
-                        response(JSON.parse(data))
+                    if(typeof(data) == 'string')
+                        data = JSON.parse(data);
+                    if(response.status == 200)
+                        res(data)
                     else
-                        reject(data)
-                    });
+                        rej(data)
+                    }).catch((err) => console.log(err));
             }).catch( (err) => 
             {
-                reject(err)
+                rej(err)
             })
     }
     )
@@ -38,24 +36,30 @@ const getSucursales = () =>
 
 const getSucursal = (idSucursal) => 
 { 
+    const getHeaders={
+        'Content-Type': 'application/json',
+    }
+
     let config = {
         method: 'GET',
-        //headers: new Headers({ 'Content-type': 'application/json'}) OJO CON ESTE HEADER QUE ME TIRA DUPLICADA LA REQUEST
+        headers: getHeaders
     };
 
-    return new Promise((response,reject) => {
+    return new Promise((res,rej) => {
 
     fetch('http://localhost:3030/api/sucursales/' + String(idSucursal), config)
-    .then(res => {   
-        res.json().then((data) => 
+    .then(response => {   
+        response.json().then((data) => 
         {
-            if(res.status == 200)
-                response(JSON.parse(data))
+            if(typeof(data) == 'string')
+                data = JSON.parse(data);
+            if(response.status == 200)
+                res((data))
             else
-                reject((data))
-        })
+                rej((data))
+        }).catch((err) => console.log(err))
     }).catch((err) => {
-            reject(err)
+            rej(err)
     })})
 
 }
@@ -64,7 +68,7 @@ const getSucursal = (idSucursal) =>
 
 const getSucursalesAuth = () => {
     
-    return new Promise((response,reject) => {
+    return new Promise((res,rej) => {
 
         const getHeadersAuth={
             'Content-Type': 'application/json',
@@ -77,24 +81,24 @@ const getSucursalesAuth = () => {
         };
         console.log(getHeadersAuth)
         fetch('http://localhost:3020/api/sucursales', config)
-        .then((res) => {   
-                res.json().then( 
+        .then((response) => {   
+                response.json().then( 
                     (data) => {
-                        console.log(res.status)
-                    if(res.status == 200)
-                        response(JSON.parse(data))
+                    if(typeof(data) == 'string')
+                        data = JSON.parse(data);
+                    if(response.status == 200)
+                        res(data)
                     else
-                        if(res.status == 401)
+                        if(response.status == 401)
                         {
                             data.auth = 1
-                            reject(data,1)
+                            rej(data,1)
                         }
                         else
-                            reject(data)
-                    });
+                            rej(data)
+                    }).catch((err) => console.log(err));
             }).catch((err) =>{
-                console.log(reject)
-                reject(err)
+                rej(err)
             })
         })
 }
@@ -109,28 +113,29 @@ const getSucursalAuth = (idSucursal) =>
     let config = {
         method: 'GET',
         headers: getHeadersAuth
-        //headers: new Headers({ 'Content-type': 'application/json'}) OJO CON ESTE HEADER QUE ME TIRA DUPLICADA LA REQUEST
     };
 
-    return new Promise((response,reject) => {
+    return new Promise((res,rej) => {
 
     fetch('http://localhost:3020/api/sucursales/' + String(idSucursal), config)
-    .then(res => {   
-        res.json().then((data) => 
+    .then(response => {   
+        response.json().then((data) => 
         {
-            if(res.status == 200)
-                response(data)
+            if(typeof(data) == 'string')
+                data = JSON.parse(data);
+            if(response.status == 200)
+                res(data)
             else
-                if(res.status == 401)
+                if(response.status == 401)
                 {
                     data.auth = 1
-                    reject(data,1)
+                    rej(data,1)
                 }
                 else
-                    reject(data)
-            })
+                    rej(data)
+            }).catch((err) => console.log(err))
     }).catch((err) => {
-            reject(err)
+        rej(err)
     })})
 
 }

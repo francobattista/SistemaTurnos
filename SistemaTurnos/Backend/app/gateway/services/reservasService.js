@@ -1,7 +1,10 @@
 const http = require('http');
+const env = require('dotenv')
 
-const enviroment_reservas_port = process.env.RESERVAS_PORT || '8080' ;
-const enviroment_reservas_path = process.env.RESERVAS_PATH || 'http://localhost:';
+env.config();
+
+const enviroment_reservas_port = process.env.RESERVAS_PORT //|| '8080' ;
+const enviroment_reservas_path = process.env.RESERVAS_PATH //|| 'http://localhost:';
 
 
 
@@ -20,6 +23,7 @@ const deleteHeader = {}
 
 const getMethod = (endpoint) => {
     return new Promise((resolve,reject) => {
+        console.log(enviroment_reservas_path)
         http.get(enviroment_reservas_path + enviroment_reservas_port + endpoint).once('response', (response) => 
         {
             response.once('data', (data) => {
@@ -43,9 +47,12 @@ const getMethod = (endpoint) => {
 
 const putMethod = (endpoint,body) => {
     return new Promise((resolve,reject) => {
+        console.log("PATH + PORT")
+        console.log(enviroment_reservas_path + enviroment_reservas_port )
+        console.log(endpoint)
         const options = {
             port: enviroment_reservas_port,
-            hostname: enviroment_reservas_path,
+            hostname: '127.0.0.1', //Se deja asi, ya que el que esta en env tiene problema por los : finales
             method: 'PUT',
             path: endpoint,
             headers:
@@ -54,9 +61,10 @@ const putMethod = (endpoint,body) => {
             'Content-Length': Buffer.byteLength(body)
             }
           };
-
+          console.log("aaaaa")
         const request = http.request(options,(response)=>{
-
+            let respuesta;
+            console.log("ress")
             response.once('data', (data) => {
                 respuesta = data.toString();
                 if(response.statusCode == 200)
@@ -68,9 +76,9 @@ const putMethod = (endpoint,body) => {
                 reject('ERROR: en la respuesta del server de reservas')
             })
         });
-
+        console.log(body)
         request.write(body);
-        request.on('error', (err) => reject('ERROR: el servidor de reservas no responde' + err))
+        request.on('error', (err) => {console.log(err);reject('ERROR: el servidor de reservas no responde' + err)})
         request.end()
     }) 
 }

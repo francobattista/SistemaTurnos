@@ -52,9 +52,7 @@ const altaReserva = (idReserva,email,userId) => {
     return new Promise((res,rej) => {
         console.log(idReserva,email)
         if(!idReserva || !email)
-        {
             rej("Error, parametros erroneos")
-        }
 
         let config = {
             method: 'PUT',
@@ -67,22 +65,22 @@ const altaReserva = (idReserva,email,userId) => {
     
         fetch("http://localhost:3030/api/reservas/solicitar/" + String(idReserva), config) 
         .then((response) => {
-            if(response.status == 404)
-                rej("No se ha podido reservar el turno")
             response.json().then((data) => 
             {
-                if(res.status != 200)
-                    reject(JSON.parse(data))
+                if(typeof(data) == 'string')
+                    data = JSON.parse(data);
+                if(response.status != 200)
+                    rej(data)
                 else
-                    response(JSON.parse(data))
-            })
-        }).catch((err) =>{ reject(err); } )
+                    res(data)
+            }).catch((err) => console.log(err))
+        }).catch((err) =>{ rej(err); } )
     })
 }
 
 const confirmaReserva = (idReserva,email,userId) => { 
     console.log("metodo: confirmaReserva")
-    return new Promise((response,reject) => {
+    return new Promise((res,rej) => {
         if(!idReserva || !email)
         {
             rej("Error, parametros erroneos")
@@ -99,16 +97,18 @@ const confirmaReserva = (idReserva,email,userId) => {
         }
 
         fetch("http://localhost:3030/api/reservas/confirmar/" + String(idReserva), config) // http://localhost:3030/api/reserva/1
-        .then((res) => 
+        .then((response) => 
         {
-            res.json().then((data) => 
+            response.json().then((data) => 
             {
-                if(res.status != 200)
-                    reject(JSON.parse(data))
+                if(typeof(data) == 'string')
+                    data = JSON.parse(data);
+                if(response.status != 200)
+                    rej(data)
                 else
-                    response(JSON.parse(data))
-            })
-        }).catch((err) =>{ reject(err); } )
+                    res(data)
+            }).catch((err) => console.log(err))
+        }).catch((err) =>{ rej(err); } )
     })
 }
 
@@ -125,16 +125,21 @@ const getReserva = (idReserva) =>{
         headers: headerPut,
 }
 
-return new Promise((response,reject) => {
+return new Promise((res,rej) => {
     fetch("http://localhost:3030/api/reservas/" + String(idReserva),config)
-    .then((res) => res.json().then( (data) => 
+    .then((response) => 
     {
-        if(res.status != 200)
-            reject(JSON.parse(data))
-        else
-            response(JSON.parse(data))
-    }))
-    .catch((err) =>{ reject(err); } )
+        response.json().then( (data) => 
+        {
+            if(typeof(data) == 'string')
+                data = JSON.parse(data);
+            if(response.status != 200)
+                rej(data)
+            else
+                res(data)
+        }).catch((err) => console.log(err))
+    }).catch((err) =>{ rej(err); })
+    
 })
 
 }
@@ -154,17 +159,19 @@ const getTurnosByParam = (idUsuario, fecha, idSucursal) =>
     queryParams.set('userId',String(idUsuario))
     queryParams.set('dateTime', fecha)
     queryParams.set('branchId',String(idSucursal))
-    return new Promise((response,reject) => {
+    return new Promise((res,rej) => {
  
         fetch("http://localhost:3030/api/reservas?" + queryParams.toString(),config)
-        .then((res) => res.json().then( (data) => {
-            console.log(data)
-            if(res.status != 200)
-                reject(data)
+        .then((response) => {
+            response.json().then( (data) => {
+            if(typeof(data) == 'string')
+                data = JSON.parse(data);
+            if(response.status != 200)
+                rej(data)
             else
-                response(JSON.parse(data))
-        }))
-        .catch((err) =>{ reject(err); } )
+                res(data)
+        })}).catch((err) => console.log(err))
+        .catch((err) =>{ rej(err); } )
     })
 }
 
@@ -199,28 +206,28 @@ const altaReservaAuth = (idReserva,email,userId) => {
     
         fetch("http://localhost:3020/api/reservas/solicitar/" + String(idReserva), config) 
         .then((response) => {
-            if(response.status == 404)
-                rej("No se ha podido reservar el turno")
             response.json().then((data) => 
             {
-                if(res.status == 200)
-                    response(JSON.parse(data))
+                if(typeof(data) == 'string')
+                    data = JSON.parse(data);
+                if(response.status == 200)
+                    res(data)
                 else
-                    if(res.status == 401)
+                    if(response.status == 401)
                     {
                         data.auth = 1
-                        reject(data)
+                        rej(data)
                     }
                     else
-                        reject(data)
+                        rej(data)
                 })
-        }).catch((err) =>{ reject(err); } )
+        }).catch((err) =>{ rej(err); } )
     })
 }
 
 const confirmaReservaAuth = (idReserva,email,userId) => { 
     console.log("metodo: confirmaReserva")
-    return new Promise((response,reject) => {
+    return new Promise((res,rej) => {
         if(!idReserva || !email)
         {
             rej("Error, parametros erroneos")
@@ -241,22 +248,24 @@ const confirmaReservaAuth = (idReserva,email,userId) => {
         }
 
         fetch("http://localhost:3020/api/reservas/confirmar/" + String(idReserva), config) // http://localhost:3030/api/reserva/1
-        .then((res) => 
+        .then((response) => 
         {
-            res.json().then((data) => 
+            response.json().then((data) => 
             {
-                if(res.status == 200)
-                    response(JSON.parse(data))
+                if(typeof(data) == 'string')
+                    data = JSON.parse(data);
+                if(response.status == 200)
+                    res(data)
                 else
-                    if(res.status == 401)
+                    if(response.status == 401)
                     {
                         data.auth = 1
-                        reject(data)
+                        rej(data)
                     }
                     else
-                        reject(data)
+                        rej(data)
                 })
-        }).catch((err) =>{ reject(err); } )
+        }).catch((err) =>{ rej(err); } )
     })
 }
 
@@ -278,26 +287,31 @@ const bajaReservaAuth = (idReserva) => {
     let config = {
         method: 'PUT',
         headers: headerPutAuth,
+        body: JSON.stringify({
+            userId : window.sessionStorage.getItem('userId')
+         })
     }
 
-return new Promise((response,reject) => 
+return new Promise((res,rej) => 
 {
     fetch("http://localhost:3020/api/reservas/" + String(idReserva),config).
-    then((res) => {
-        res.json().then(( (data) => 
+    then((response) => {
+        response.json().then(( (data) => 
         {
-            if(res.status == 200)
-                response(JSON.parse(data))
+            if(typeof(data) == 'string')
+                data = JSON.parse(data);
+            if(response.status == 200)
+                res(data)
             else
-                if(res.status == 401)
+                if(response.status == 401)
                 {
                     data.auth = 1
-                    reject(data)
+                    rej(data)
                 }
                 else
-                    reject(data)
+                    rej(data)
             }))
-    }).catch((err) =>{ reject(err); } )
+    }).catch((err) =>{ rej(err); } )
 })
 
 }
@@ -320,22 +334,24 @@ const getReservaAuth = (idReserva) =>{
         headers: headerPutAuth,
 }
 
-return new Promise((response,reject) => {
+return new Promise((res,rej) => {
     fetch("http://localhost:3020/api/reservas/" + String(idReserva),config)
-    .then((res) => res.json().then( (data) => 
+    .then((response) => response.json().then( (data) => 
     {
-        if(res.status == 200)
-            response(JSON.parse(data))
+        if(typeof(data) == 'string')
+            data = JSON.parse(data);
+        if(response.status == 200)
+            res(data)
         else
-            if(res.status == 401)
+            if(response.status == 401)
             {
                 data.auth = 1;
-                reject(data)
+                rej(data)
             }
             else
-                reject(data)
+                rej(data)
         }))
-    .catch((err) =>{ reject(err); } )
+    .catch((err) =>{ rej(err); } )
 })
 
 }
@@ -361,22 +377,24 @@ const getTurnosByParamAuth = (idUsuario, fecha, idSucursal) =>
     queryParams.set('dateTime', fecha)
 
     if(idSucursal) queryParams.set('branchId',String(idSucursal))
-    return new Promise((response,reject) => {
+    return new Promise((res,rej) => {
  
         fetch("http://localhost:3020/api/reservas?" + queryParams.toString(),config)
-        .then((res) => res.json().then( (data) => {
-            if(res.status == 200)
-                response(JSON.parse(data))
+        .then((response) => response.json().then( (data) => {
+            if(typeof(data) == 'string')
+                data = JSON.parse(data);
+            if(response.status == 200)
+                res(data)
             else
-                if(res.status == 401)
+                if(response.status == 401)
                 {
                     data.auth = 1;
-                    reject(data);
+                    rej(data);
                 }
                 else
-                    reject(data)
+                    rej(data)
             }))
-        .catch((err) =>{ console.log(err);reject(err); } )
+        .catch((err) =>{ rej(err); } )
     })
 }
 

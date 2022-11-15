@@ -7,7 +7,7 @@ const reservasService = require('./services/reservasService.js')
 
 //Configuraciones del GATEWAY en archivo .env
 const enviroment_gatway_port = process.env.PORT || 3030
-const enviroment_gatway_host = process.env.HOST || '127.0.0.0'
+const enviroment_gatway_host = process.env.HOST || '127.0.0.1'
 
 
 const responseHeaders = {
@@ -76,13 +76,19 @@ const redirectRequestPut = (req,res,url) => {
     bodyParser(req,res).then( (body) => 
     {
         req.body = body;
+
         console.log(req.body)
         if(url.startsWith('/api/reservas/')) 
         {
+            if(Number(JSON.parse(req.body).userId) !== 0)//EXPLICACION: SI PASA POR ESTE GATEWAY TIENE QUE SER SI O SI UN USERID = 0
+            {
+                createErrorResponse(res,'ERROR: En este modo solo pueden reservar como invitado');
+                return;
+            }        
             reservasService.putMethod(url,req.body).then( //No me importa si va a reservas/1 o a reservas/. Solo redirecciono y que se arregle reservas.js
             (respuesta) => {
                 createOkReponse(res,respuesta)
-            }).catch((err)=>{createErrorResponse(res,"Error en el put enviado a las reservas")}); 
+            }).catch((err)=>{createErrorResponse(res,err)}); 
             return; //para cortar ejec
         }
         createErrorResponse(res,'ERROR: No se ha encontrado el recurso solicitado')    
@@ -142,10 +148,19 @@ const server = http.createServer( (req,res) =>
 
 
 const createErrorResponse = (res,message) =>{
-    console.log("Create error response:")
-    console.log(JSON.stringify({message: message}))
+    console.log(message)
+    console.log(typeof(message))
+
+    if(!message.includes('message'))
+    {
+        if(typeof(message) == 'object')
+            message = JSON.stringify(message);
+        else
+            message = JSON.stringify({message: message});
+    }
+    
     res.writeHead(codes.notFound,responseHeaders);
-    res.end(JSON.stringify({message: message}))
+    res.end(message)
 
 }
 
@@ -153,8 +168,10 @@ const createOkReponse = (res,data) => {
 
     console.log("Create ok response")
     console.log(data)
+    if(typeof(data) == 'object')
+        data = JSON.stringify(data);
     res.writeHead(codes.statusOk,responseHeaders)
-    res.end(JSON.stringify(data))
+    res.end(data)
 
 }
 

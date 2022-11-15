@@ -5,7 +5,7 @@ const fs = require('fs')
 
 //Configuraciones del GATEWAY en archivo .env
 const enviroment_sucursales_port = process.env.SUCURSALES_PORT || 8090
-const enviroment_sucursales_path = process.env.SUCURSALES_PATH || '0.0.0.0'
+const enviroment_sucursales_path = process.env.SUCURSALES_PATH || 'http://localhost:'
 
 const responseHeaders = {
     'Access-Control-Allow-Origin': '*', 
@@ -48,17 +48,7 @@ const processRequestGet = (req,res,url) =>
     else
         respuesta =JSON.parse(fs.readFileSync('./sucursales.json').toString()); //Lo parseo igual, porque sino abajo (que tengo toda la rta junta), me va a ahcer stringify de algo que no esta parceado y lo codifica mal
 
-    res.writeHead(codes.statusOk,responseHeaders)
-    res.end(JSON.stringify(respuesta)) //Me puedo dar la libertad de hacer esto, porque el readFile es async, entonces bloquea. Preguntar por si acaso si se prefiere que readF sea async
-
-    req.on('data',(chunk) =>
-    {
-        body += chunk; 
-    })
-
-    req.on('error', (err) =>{
-        createErrorResponse(req,"Error en la request en sucursales")
-    })
+    createOkResponse(res,respuesta);
 
 }
 
@@ -81,13 +71,22 @@ const server = http.createServer( (req,res) =>
 
 
 const createErrorResponse = (res,message) =>{
+    if(typeof(message) == 'object')
+        message = JSON.stringify(message);
+    else
+        if(!message.includes('message'))
+            message = JSON.stringify({message: message});
     res.writeHead(codes.notFound,responseHeaders);
-    res.end(JSON.stringify({message: message}))
+    res.end(message)
 }
 
 const createOkResponse = (res,data) => {
+
+    if(typeof(data) == 'object')
+        data = JSON.stringify(data);
+
     res.writeHead(codes.statusOk,responseHeaders);
-    res.end(JSON.stringify({data}))
+    res.end(data);
 }
 
 

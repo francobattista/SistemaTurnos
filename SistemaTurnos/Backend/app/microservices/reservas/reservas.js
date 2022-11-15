@@ -5,7 +5,8 @@ const env = require('dotenv')
 
 const reservasNotificationService = require('./reservasNotificationsService.js')
 const reservasNotificationsService = require('./reservasNotificationsService.js')
-const { createRecordatorio } = require('./recordatorios/recordatorios.js')
+const { createRecordatorio, bajaRecordatorio } = require('./recordatorios/recordatorios.js')
+const { isNumberObject } = require('util/types')
 
 env.config();
 
@@ -52,8 +53,7 @@ const reparteRequest = (request,response,url,method) =>{
         case 'DELETE':
             break;
         case 'OPTIONS':
-            response.writeHead(codes.statusOk,responseHeaders);
-            response.end(JSON.stringify({message:'Options OK!'}));
+            createOkResponse(response,{message:'Options OK!'});
             break;
         default:;
     }
@@ -79,7 +79,8 @@ const processRequestPut = (req,res,url) => {
                 {
                     const idReserva = url.split('solicitar/')[1]; // Tengo que tener una forma de diferenciar si es para usuario o sucursal... (reserva no pq nunca va a ser get)
                     if(idReserva)
-                    {
+                    {   
+                        console.log(req.body.userId)
                         if(validaID(req.body.userId))
                         {
                             console.log("a")
@@ -87,18 +88,17 @@ const processRequestPut = (req,res,url) => {
                             let reservas = JSON.parse(fs.readFileSync('./reservas.json').toString())
                             reservas.map((element) => { //nO ES NECESARIO Q SEA UN MAP
                                 if(element.idReserva == idReserva)
-                                    if(element.userId == "-1" && element.status == '0') 
+                                    if(element.userId == -1 && element.status == 0) 
                                     {
                                         element.userId = String(req.body.userId);
-                                        element.status = "1"
+                                        element.status = 1
                                         ok = true;
                                     }
                             })
                             if(ok)
                             {
                                 fs.writeFileSync('./reservas.json', JSON.stringify(reservas));
-                                res.writeHead(codes.statusOk,responseHeaders) 
-                                res.end(JSON.stringify({message: "El turno fue reservado, confirmelo antes del minuto o sera dado de baja!"}))  
+                                createOkResponse(res,{message: "El turno fue reservado, confirmelo antes del minuto o sera dado de baja!"});
                                 let timeout = setTimeout(() => //Si al pasar los segundos, el turno no se confirmo, lo baja
                                 {
                                     console.log(idReserva)
@@ -106,10 +106,10 @@ const processRequestPut = (req,res,url) => {
                                     let reservas = JSON.parse(fs.readFileSync('./reservas.json').toString())
                                     reservas.map((element) => { //nO ES NECESARIO Q SEA UN MAP
                                         if(element.idReserva == idReserva)
-                                            if(element.status != "2") 
+                                            if(element.status != 2) 
                                             {
-                                                element.userId = "-1";
-                                                element.status = "0"
+                                                element.userId = -1;
+                                                element.status = 0
                                                 ok = true;
                                             }
                                      })
@@ -147,9 +147,9 @@ const processRequestPut = (req,res,url) => {
                                 if(element.idReserva == idReserva)
                                     if(element.userId == req.body.userId && element.status == 1) //la primer parte del if la tengo q mover mas arriba, para q no analice si viene un id vacio
                                     {
-                                        element.userId = req.body.userId;
+                                        element.userId = Number(req.body.userId);
                                         element.email = req.body.email;
-                                        element.status = "2"
+                                        element.status = 2
                                         fecha = new Date(element.dateTime);
                                         ok = true;
                                     }
@@ -157,14 +157,14 @@ const processRequestPut = (req,res,url) => {
                             if(ok)
                             {
                                 fs.writeFileSync('./reservas.json', JSON.stringify(reservas));
-                                reservasNotificationService.createNotification(req.body.email, "CONFIRMACION TURNO",`Mi loko, el dia ${fecha.toLocaleDateString()} a la hora ${fecha.toLocaleTimeString()} reservaste un turnito en el #PotreroDeCoccaro `).then((res) => {
+                                reservasNotificationService.createNotification(req.body.email, "CONFIRMACION TURNO",`Hola, el dia ${fecha.toLocaleDateString()} a la hora ${fecha.toLocaleTimeString()} reservaste un turninho en el #PotreroDeCoccaro. <img src="./imgs/ronaldinho-tongue.gif">`).then((res) => {
                                     console.log("CREATE NOTIFICATION: LLego al resolve " + res)
                                 })
                                 createRecordatorio(req.body,fecha).then((res) => {
                                     console.log("CREATE RECORDATORIO: LLego al resolve " + res)
                                 })
-                                res.writeHead(codes.statusOk,responseHeaders) //Pongo esto aca pq el turno se reservo c exito, depsues lo q pase con la notificacion veo despues
-                                res.end(JSON.stringify({message: "El turno se confirmo con exito!"})) //Me puedo dar la libertad de hacer esto, porque el readFile es async, entonces bloquea. Preguntar por si acaso si se prefiere que readF sea async
+
+                                createOkResponse(res,{message: "El turno se confirmo con exito!"});
                                 return;
                             }
                             else
@@ -176,30 +176,39 @@ const processRequestPut = (req,res,url) => {
                     else
                         createErrorResponse(res,'ERROR: idReserva nulo')
                 }
+                else if(Number(slug)) //Es un delete
+                {
+                    if(validaID(req.body.userId))
+                    {
+                        let ok = false;
+                        let reservas = JSON.parse(fs.readFileSync('./reservas.json').toString())
+                        reservas.map((element) => { //deberia usar mejor el map jeje, lo estoy suando mal
+                            if(element.idReserva == slug && element.userId == req.body.userId)
+                            {
+                                element.userId = -1;
+                                element.email = "";
+                                element.status = 0;
+                                ok = true;
+                            }
+                        })
+                        if(ok)
+                        {
+                            fs.writeFileSync('./reservas.json', JSON.stringify(reservas));
+                            bajaRecordatorio(req.body).then((res) => {console.log("tumbo el recordatorio")});
+                            createOkResponse(res,{message: "El turno se ELIMINO con exito"});
+                            return;
+                        }
+                        else
+                            createErrorResponse(res, "ERROR: No se ha podido eliminar el turno")
+                    }
+                    else   
+                        createErrorResponse(res,"ERROR: Algun parametro es erroneo")
+                }
                 else
                     createErrorResponse(res,'ERROR: Recurso no encontrado');                
             }
-            else //Es un delete
-            {
-                let ok = false;
-                let reservas = JSON.parse(fs.readFileSync('./reservas.json').toString())
-                reservas.map((element) => { //deberia usar mejor el map jeje, lo estoy suando mal
-                    if(element.idReserva == slug)
-                    {
-                        element.userId = "";
-                        ok = true;
-                    }
-                })
-                if(ok)
-                {
-                    fs.writeFileSync('./reservas.json', JSON.stringify(reservas));
-                    res.writeHead(codes.statusOk,responseHeaders)
-                    res.end(JSON.stringify({Message: "El turno se ELIMINO con exito"})) //Me puedo dar la libertad de hacer esto, porque el readFile es async, entonces bloquea. Preguntar por si acaso si se prefiere que readF sea async
-                    return;
-                }
-                else
-                    createErrorResponse(res, "ERROR: No se ha podido eliminar el turno")
-            }
+            else   
+                createErrorResponse(res,'ERROR: Recurso no encontrado');    
         }
         else
             createErrorResponse(res,"ERROR: un parametro es erroneo")
@@ -225,23 +234,21 @@ const processRequestGet = (req,res,url) =>
         {
             reservas = JSON.parse(fs.readFileSync('./reservas.json').toString())   
             respuesta = reservas.filter((f) => {return f.idReserva == slug});
-            res.writeHead(codes.statusOk,responseHeaders)
-            res.end(JSON.stringify(respuesta)) 
+            createOkResponse(res,respuesta);
             return;
         }
         else
         {
-            res.writeHead(codes.notFound,responseHeaders)
-            res.end(JSON.stringify({message: "Recurso no encontrado"})) 
+            createErrorResponse(res,'Recurso no encontrado')
             return;
         }    
     }
     else // /api/reservas o /api/reservas?
     {
+        console.log(url)
         let reservas;
-        queryP = url.split('/api/reservas?')[1]
+        const queryP = url.split('/api/reservas?')[1]
         const queryParams = new URLSearchParams(queryP);
-
         if(queryParams.has('userId') || queryParams.has('dateTime') || queryParams.has('branchId')) //Significa que estoy en el get con filtros
         {
             reservas = JSON.parse(fs.readFileSync('./reservas.json').toString())
@@ -250,40 +257,44 @@ const processRequestGet = (req,res,url) =>
                 filtros.push({filtro:'userId',valor:queryParams.get('userId')})
             if(queryParams.has('dateTime') && queryParams.get('dateTime')!='')
                 filtros.push({filtro:'dateTime',valor:queryParams.get('dateTime')})
-            if(queryParams.has('branchId') && queryParams.get('idSucbranchIdursal')!='') 
+            if(queryParams.has('branchId') && queryParams.get('branchId')!='') 
                 filtros.push({filtro:'branchId',valor:queryParams.get('branchId')})
+            console.log(filtros)
             let respuesta = reservas;
             filtros.forEach((filtro) => {
                 
                 respuesta = respuesta.filter((r) => {
-                    console.log(filtro.valor)
                     if(filtro.filtro == 'dateTime')
                     {
-                        const date1= new Date(r[filtro.filtro]).toLocaleDateString();
-                        const date2= new Date(filtro.valor).toLocaleDateString();
+                        const date1= r[filtro.filtro].split('T')[0]; //2022-10-04
+                        const date2= filtro.valor; //2022-10-04
                         return date1 == date2;
                     }
                     else
                         return r[filtro.filtro] == filtro.valor
                 })
-                console.log(respuesta)
             })
-            res.writeHead(codes.statusOk,responseHeaders)
-            console.log(respuesta)
-            res.end(JSON.stringify(respuesta)) 
+
+            createOkResponse(res,respuesta);
             return;
 
         } // /api/reservas sin querys, trae todas las reservas
-        else{
+        else if(url == '/api/reservas')
+        {
             reservas = JSON.parse(fs.readFileSync('./reservas.json').toString())   
-            res.writeHead(codes.statusOk,responseHeaders)
-            res.end(JSON.stringify(reservas)) 
+            createOkResponse(res,reservas);
             return;
         }
+        else
+        {
+            console.log("ACAA")
+            createErrorResponse(res,'ERROR: Recurso no ecnontrado');
+            return;
+        }
+        
     }
 
-    res.writeHead(codes.notFound,responseHeaders)
-    res.end() 
+    createErrorResponse(res,'ERROR: Recurso no ecnontrado');
 
 //Me puedo dar la libertad de hacer esto, porque el readFile es async, entonces bloquea. Preguntar por si acaso si se prefiere que readF sea async
     
@@ -316,23 +327,36 @@ server.listen( envirioment_port_reservas, (req,res) => {
 
 
 const validaID = (userId) => {
-    return userId !== '';
+    id = Number(userId);
+    console.log(id)
+    if(userId === '') return false; //harcodeadisimo pero eficiente :)
+
+    return id !== undefined && id !== NaN && isNumberObject(new Number(id)) && id > -1
 }
 
 
 const validaEmail = (email) =>{
-    return email =! '';
+    return email && email !== '';
 }
 
 
-const createErrorResponse = (res,msg) =>
+const createErrorResponse = (res,message) =>
 {
-    console.log(msg)
+    if(typeof(message) == 'object')
+        message = JSON.stringify(message);
+    else
+        if(!message.includes('message'))
+            message = JSON.stringify({message: message});
+
     res.writeHead(codes.notFound,responseHeaders)
-    res.end(JSON.stringify({message : msg})) 
+    console.log(message)
+    res.end(message) 
 }
 
-const createOkResponse = (res,msg) => 
-{
-
+const createOkResponse = (res,data) => 
+{   console.log(data)
+    if(typeof(data) == 'object')
+        data = JSON.stringify(data);
+    res.writeHead(codes.statusOk, responseHeaders);
+    res.end(data);
 }

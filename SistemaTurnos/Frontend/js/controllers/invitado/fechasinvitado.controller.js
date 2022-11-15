@@ -21,7 +21,8 @@ export default (data) => {
         </div>
     </dialog>
     <button id="btnBackF" class="btn btn-primary">ATRAS !</button>
-    <h2 style="margin:20px;color:white;">TURNOS DISPONIBLES<h2>
+    <h2 style="margin:20px;color:white;  -webkit-text-stroke: 2px rgb(8, 191, 26);
+    text-shadow: black 0.1em 0.1em 0.2em;">TURNOS DISPONIBLES<h2>
     `;
   const divElement = document.createElement("div");
   divElement.innerHTML = view;
@@ -51,7 +52,7 @@ export default (data) => {
 
     fecha.style["font-size"] = "50px";
 
-    fecha.style["background-color"] = "white"
+    fecha.style["background-color"] = "#dafa04"
     fecha.addEventListener("click", (event) => {
       if (inputEmail.value && event.target.body.idReserva) {
         altaReserva(event.target.body.idReserva, inputEmail.value, 0)
@@ -81,11 +82,11 @@ export default (data) => {
     });
 
     fecha.addEventListener("mouseover", (event) => {
-      fecha.style["background-color"] = "#7ca3b9";
+      fecha.style["background-color"] = "rgb(8, 191, 26)";
       fecha.style["border-radius"] = "10px";
     });
     fecha.addEventListener("mouseout", (event) => {
-      fecha.style["background-color"] = "white";
+      fecha.style["background-color"] = "#dafa04";
     });
   };
 
@@ -108,6 +109,8 @@ export default (data) => {
     h3.innerHTML = "FECHA SELECCIONADA: " + f.toLocaleDateString();
     h3.style["margin"] = "20px";
     h3.style["color"]="white"
+    h3.style["-webkit-text-stroke"] = "2px rgb(8, 191, 26)";
+    h3.style["text-shadow"] = "black 0.1em 0.1em 0.2em";
     divElement.appendChild(h3);
 
     data.forEach((element) => {

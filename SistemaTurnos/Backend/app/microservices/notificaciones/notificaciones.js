@@ -61,8 +61,7 @@ const processRequestPost = (req,res,url) => {
     bodyParser(req,res).then((body)=>{
         req.body = JSON.parse(body)
         notificationsService.confirmationEmail(req.url,req.body).then((response)=>{
-            res.writeHead(codes.statusOk,responseHeaders); 
-            res.end(JSON.stringify({message:'Confirmacion enviada con exito!'}))
+            createOkResponse(res,{message:'Confirmacion enviada con exito!'});
         }).catch((err) => {createErrorResponse(res,'No se ha podido enviar la confirmacion del mail')});
     })
 }
@@ -91,9 +90,21 @@ const server = http.createServer( (req,res) =>
 
 const createErrorResponse = (res,message) =>{
 
+    if(typeof(message) == 'object')
+        message = JSON.stringify(message);
+    else
+        if(!message.includes('message'))
+            message = JSON.stringify({message: message});
+            
     res.writeHead(codes.notFound,responseHeaders);
-    res.end(JSON.stringify({messageError: message}))
+    res.end(message)
+}
 
+const createOkResponse = (res,data) => {
+    if(typeof(data) == 'object')
+        data = JSON.stringify(data);
+    res.writeHead(codes.statusOk,responseHeaders); 
+    res.end(data);
 }
 
 

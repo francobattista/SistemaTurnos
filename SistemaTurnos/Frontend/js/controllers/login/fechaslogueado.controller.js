@@ -5,14 +5,11 @@ import {
     confirmaReservaAuth,
   } from "../../services/reservasService.js";
   
-  //Eso se puede hacer con webpack, y me ahorra tener que pasar las vistas como string aca, es decir, podria usar un arch html
   
   export default (data) => {
-    console.log(data);
     const view = `
       <h1 style="color:white;" id="h1Princ">El Potrero de Coccaro</h1>
       
-      <input type="text" id="inputEmail" placeholder="Email">
       <dialog id="dialogConfirm">
           <p>CONFIRME SU TURNO: TIENE UN MINUTO PARA HACERLO</p>
           <div id="divBotonesConfirmacion">
@@ -21,16 +18,26 @@ import {
           </div>
       </dialog>
       <button id="btnBackF" class="btn btn-primary">ATRAS !</button>
-      <h2 style="margin:20px;color:white;">TURNOS DISPONIBLES<h2>
+      <h2 style="margin:20px;color:white;  -webkit-text-stroke: 2px rgb(8, 191, 26);
       `;
+
     const divElement = document.createElement("div");
     divElement.innerHTML = view;
   
+
+    //Componente--------------------------
+
+    const userUnauthorized = () => {
+      window.location.hash = '#/login'
+    }
+
+    //DIALOG y BOTONES DEL DOM
     const dialog = divElement.querySelector("#dialogConfirm");
   
     const createDialog = () => {
       dialog.showModal();
     };
+
     const closeDialog = (res) => {
       dialog.close(res);
     };
@@ -41,48 +48,45 @@ import {
     divElement.querySelector("#Cancel").addEventListener("click", () => {
       closeDialog(0);
     });
-    const userUnauthorized = () => {
-      window.location.hash = '#/login'
-    }
+
+    const backBtnF = divElement.querySelector("#btnBackF");
+    backBtnF.addEventListener("click", () => {
+      window.location.hash = "#/reservaturnoslog";
+    });
+    
+    const inputEmail = divElement.querySelector("#inputEmail");
+
 
 
     const preparaFechas = (fecha) => {
       fecha.style["display"] = "flex";
-  
       fecha.style["justify-content"] = "center";
-  
       fecha.style["margin"] = "5px";
-  
       fecha.style["font-size"] = "50px";
-  
-      fecha.style["background-color"] = "white"
+      fecha.style["background-color"] = "#dafa04";
+
       fecha.addEventListener("click", (event) => {
-        if (inputEmail.value && event.target.body.idReserva) {
-          altaReservaAuth(event.target.body.idReserva, inputEmail.value, 0)
-            .then((res) => {
+        if (event.target.body.idReserva) {
+          altaReservaAuth(event.target.body.idReserva, sessionStorage.getItem('email'),sessionStorage.getItem('userId'))
+            .then((res) => {//la resp no interesa mucho pq si no se pudo reservar trae codigo de error
               createDialog();
               dialog.addEventListener("close", (r) => {
-                if (Number(dialog.returnValue)) {
-                  confirmaReservaAuth(
-                    event.target.body.idReserva,
-                    inputEmail.value,
-                    0
-                  )
-                    .then((r) => {
-                      alert("Reserva confirmada con exito!");
-                    })
-                    .catch((err) => {
-                      if(err.auth)
-                          userUnauthorized();
-                      else
-                          alert("Error en la confirmacion")
-                  });
+                if (Number(dialog.returnValue)) 
+                {
+                  confirmaReservaAuth(event.target.body.idReserva,sessionStorage.getItem('email'),sessionStorage.getItem('userId')).then((r) => {
+                      alert("Reserva confirmada con exito!");}).catch((err) => 
+                      {
+                        if(err.auth)
+                            userUnauthorized();
+                        else
+                            alert("Error en la confirmacion")
+                      });
                 } else {
                 }
                 window.location.hash = "#/reservaturnoslog";
               });
-            })
-            .catch((err) => {
+            }).catch((err) => 
+            {
               if(err.auth)
                   userUnauthorized();
               else
@@ -90,36 +94,39 @@ import {
           });
         } else alert("parametros incorrectos");
       });
-      console.log("as")
+      
+
+      //ESTILOS DE LAS FECHAS
       fecha.addEventListener("mouseover", (event) => {
-        fecha.style["background-color"] = "#7ca3b9";
+        fecha.style["background-color"] = "rgb(8, 191, 26)";
         fecha.style["border-radius"] = "10px";
       });
       fecha.addEventListener("mouseout", (event) => {
-        fecha.style["background-color"] = "white";
+        fecha.style["background-color"] = "#dafa04";
       });
     };
   
+
+
+
+    
     const formateaFechas = (fecha) => {
       return new Date(fecha).toLocaleTimeString();
     };
   
-    const backBtnF = divElement.querySelector("#btnBackF");
-    backBtnF.addEventListener("click", () => {
-      window.location.hash = "#/reservaturnoslog";
-    });
-    
-    const inputEmail = divElement.querySelector("#inputEmail");
+    //CON LA DATA RECIBIDA DE OTRO COMPONENTE ARMO LAS FECHAS
     const horariosReserva = document.createElement("div");
     divElement.appendChild(horariosReserva);
-    if (data) {
+    if (data) 
+    {
       const h3 = document.createElement("h3");
-  
       const f = new Date(data[0].dateTime);
       console.log(f.toLocaleDateString());
       h3.innerHTML = "FECHA SELECCIONADA: " + f.toLocaleDateString();
       h3.style["margin"] = "20px";
       h3.style["color"]="white"
+      h3.style["-webkit-text-stroke"] = "2px rgb(8, 191, 26)";
+      h3.style["text-shadow"] = "black 0.1em 0.1em 0.2em";
       divElement.appendChild(h3);
   
       data.forEach((element) => {

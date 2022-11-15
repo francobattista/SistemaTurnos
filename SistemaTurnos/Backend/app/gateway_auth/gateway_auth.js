@@ -23,7 +23,22 @@ const enviroment_gatway_host = process.env.GATEWAY_AUTH_HOST;
 const enviroment_gatway_port = process.env.GATEWAY_AUTH_PORT;
 
 app.set('name','ElPotreroDeCoccaro');
+const bodyParser = (req,res) =>{
+    return new Promise((res,rej)=>{
+        let body='';
+        req.on('data', (c) => {
+            body += c;
+    
+        })
+        req.on('end', () => {
+            res(body)
+        })
 
+        req.on('error',(e) => {
+            rej('ERROR: El body enviado tiene errores');
+        })
+    })
+}
 
 const checkJwt = auth({
     audience: 'R7MwFIXgCMgvblhVY6aGMLEpZ769rfpr',
@@ -32,14 +47,13 @@ const checkJwt = auth({
 
 
 const middlewareEntrada = (req,res,next) =>{
-    console.log(req.method);
+    console.log("ENTRADA");
     next();
 }
 
 const middlewareSalida = (err,req,res,next) =>{
-    console.log("Salida Err");
-    console.log(err.status)
-    console.log(res.statusCode)
+    console.log("SALIDA ERRONEA");
+    console.log(err)
     if(err.status)
     {
         res.writeHead(err.status,responseHeaders);
@@ -47,19 +61,25 @@ const middlewareSalida = (err,req,res,next) =>{
     }
     else
     {
+        if(typeof(err) == 'object')
+            err = JSON.stringify(err);
+        else
+            if(!err.includes('message'))
+                err = JSON.stringify({message: err});
         res.writeHead(404,responseHeaders);
-        console.log(err)
-        res.end(JSON.stringify({message:err})) 
+        res.end(err) 
     }
 
 }
 
 const middlewareSalidaOk = (req,res,next) =>{
     console.log("Salida OK");
-    console.log(res.statusCode)
+    let data = res.body;
+    if(typeof(res.body) == 'object')
+        data = JSON.stringify(res.body);
+    console.log(data)
     res.writeHead(200,responseHeaders);
-    console.log(res.body)
-    res.end(JSON.stringify(res.body))
+    res.end(data)
 }
 
 app.use(middlewareEntrada);
@@ -103,6 +123,8 @@ app.get('/api/reservas/:idReserva', checkJwt, (request,response,next) => { //Get
 })
 
 app.get('/api/reservas',checkJwt, (request,response,next) => { //Get reservas con filtros
+
+    console.log("aca")
     reservasService.getMethod(request.url).then((res) => {
         response.body = res;
         next();
@@ -112,37 +134,74 @@ app.get('/api/reservas',checkJwt, (request,response,next) => { //Get reservas co
 
 })
 
-app.delete('/api/reservas/:idReserva', checkJwt, (request,response,next) => { //Baja de una reserva
-    reservasService.getMethod(request.url).then((res) => {
-        response.body = res;
-        next();
-    }).catch((err) => {
-        next(err);
-    });
+app.put('/api/reservas/:idReserva', checkJwt, (request,response,next) => { //Baja de una reserva
+    
+    bodyParser(request,response).then((body)=>{
+        request.body = body;
+        reservasService.putMethod(request.url,request.body).then((res) => {
+            response.body = res;
+            next();
+        }).catch((err) => {
+            next(err);
+        });
+
+    })
+
 
 })
 
 app.put('/api/reservas/solicitar/:idReserva', checkJwt, (request,response,next) => { //Solicitud de reserva
-    reservasService.putMethod(request.url).then((res) => {
-        response.body = res;
-        next();
-    }).catch((err) => {
-        next(err);
-    });   
+    
+    console.log("entro")
+    bodyParser(request,response).then(body=>{
+        console.log(body)
+        request.body = body;
+        reservasService.putMethod(request.url,request.body).then((res) => {
+            response.body = res;
+            next();
+        }).catch((err) => {
+            console.log(err)
+            next(err);
+        });  
+    })
+ 
 
 })
 
 app.put('/api/reservas/confirmar/:idReserva', checkJwt,  (request,response,next) => { //Confirmacion de una reserva
-    reservasService.putMethod(request.url).then((res) => {
-        response.body = res;
-        next();
-    }).catch((err) => {
-        err.message = "No responde el servidor de reservas"
-        next(err);
-    });
+    
+    
+    bodyParser(request,response).then(body=>{
+        request.body = body;
+        reservasService.putMethod(request.url,request.body).then((res) => {
+            response.body = res;
+            next();
+        }).catch((err) => {
+            err.message = "No responde el servidor de reservas"
+            next(err);
+        });
+
+
+    })
+
 })
+/*
+app.get('*', function(req, res, next){
+    next("ERROR: recurso no encontrado")
+  });
 
+app.put('*', function(req, res, next){
+    next("ERROR: recurso no encontrado")
+});
 
+app.delete('*', function(req, res, next){
+    next("ERROR: recurso no encontrado")
+});
+
+app.post('*', function(req, res, next){
+    next("ERROR: recurso no encontrado")
+});
+*/
 app.use(middlewareSalida);
 app.use(middlewareSalidaOk);
 

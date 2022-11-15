@@ -45,7 +45,7 @@ const putMethod = (endpoint,body) => {
     return new Promise((resolve,reject) => {
         const options = {
             port: enviroment_reservas_port,
-            hostname: enviroment_reservas_path,
+            hostname: '127.0.0.1',
             method: 'PUT',
             path: endpoint,
             headers:

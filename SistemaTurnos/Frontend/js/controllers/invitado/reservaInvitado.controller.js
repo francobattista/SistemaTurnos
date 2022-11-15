@@ -14,7 +14,7 @@ export default () => {
 
 
 
-        <input type="button" id="btnLoginInv" value="LOG IN">
+        <input type="button" id="btnLoginInv" class="btnStyle" value="LOG IN">
           <select id="sucursalesId" name="select">
           </select>
 
@@ -102,9 +102,9 @@ export default () => {
               const element = fechasHTML.children[index];
               element.addEventListener('click', (event) => 
               {
-                  let selectedDay = new Date(2022,mesActualNumber,Number(event.target.innerHTML))
+                let selectedDay = new Date(2022,mesActualNumber,Number(event.target.innerHTML)).toISOString().split('T')[0]; //Hecho asi porque se cambiaron los formatos de fechas...........
                   //getReservas
-                  getTurnosByParam('-1',selectedDay.toISOString(),sucursalesId.value).then((r) => {
+                  getTurnosByParam('-1',selectedDay,sucursalesId.value).then((r) => {
                     console.log(r)
                       if(r.length>0)  
                       {
@@ -125,7 +125,7 @@ export default () => {
                   if(f.toLocaleDateString() == fechaDeHoy.toLocaleDateString()) //es el dia de hoy
                       element.style['background-color'] = "black";
                   else
-                      element.style['background-color'] = "#66b6e1";
+                      element.style['background-color'] = "#dafa04";
               })
               
           }
