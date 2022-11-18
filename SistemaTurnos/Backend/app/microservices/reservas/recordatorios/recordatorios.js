@@ -6,12 +6,12 @@ const reservasNotificationService = require('./../reservasNotificationsService.j
 //console.log(a.getTime()/1000 - 86400000/1000)
 
 
-let timeouts = [];
+let timeouts = new Array();
 
 const createRecordatorio = (datosRecordatorio, reservaDate) =>{
   return new Promise((res,rej) => {
     const today = new Date();
-
+    console.log(reservaDate.getTime())
     const diferencia = reservaDate.getTime() - today.getTime();
 
     let cuandoAviso = (reservaDate.getTime() - 24*3600*1000) - today.getTime(); //cuando le tengo q avisar
@@ -21,7 +21,8 @@ const createRecordatorio = (datosRecordatorio, reservaDate) =>{
     console.log("datosRecordatorio",datosRecordatorio)
     console.log("dif",diferencia);
     console.log("cuandoAviso", cuandoAviso);
-    if(diferencia > 24*3600*1000)
+    console.log(datosRecordatorio.userId)
+    if(diferencia > 24*3600*1000) //Si la dif fue mayor a 24 hs
       if(datosRecordatorio.userId != 0)
         timeout[datosRecordatorio.userId] = (setTimeout(() => {
           console.log("recordar")
@@ -46,7 +47,10 @@ const bajaRecordatorio = (datos) => {
 
     if(datos.userId != 0)
       if(timeouts[datos.userId])
+      {
+      
         clearTimeout(timeouts[datos.userId]); //Si el usuario es distinto de 0 y tenia un recordatorio, que lo borre
+      }
 
 
     //no creo nada

@@ -24,7 +24,7 @@ window.addEventListener('hashchange', (ev) => {
 
 })
 
-console.log(document.getElementById('cancion').autoPlay);
+//console.log(document.getElementById('cancion').autoPlay);
 if(window.location.hash === '')
      window.location.hash = '#/login'
 
