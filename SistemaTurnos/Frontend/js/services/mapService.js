@@ -1,6 +1,6 @@
 //TODOS LOS TURNOS DE UN USUARIO PARA TODAS LAS SUCURSALES
 
-let uuidMap = '8752b918-b3eb-4282-8ba7-571c40fce0c4'
+let uuidMap = '463b7e95-9ace-47c0-9daf-f65c24e55f89'
 let mapToken = 'Gps9XMfhFoReTjgvXFrjWRnZpcrmx4tW';
 let srcMap = 'https://app.cartes.io/maps/' + uuidMap + '/embed?type=map&lat=-38.021465783288015&lng=-57.55720138549805&zoom=12';
 
@@ -40,7 +40,7 @@ const addMarker = (element) => {
                 console.log(data);
                 mapToken = data.token;
                 res((data));
-            })
+            }).catch((error) => console.log(error))
         }).catch((err) =>{ rej("ERROR: No se pudo dibujar el marker"); } )
     })
 

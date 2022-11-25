@@ -143,7 +143,7 @@ export default () => {
               sucursalesId.appendChild(op);
             });
         }
-        ).catch((err) => alert("ERROR: No se pueden traer las sucursales"))
+        ).catch((err) => {console.log(err);alert("ERROR: No se pueden traer las sucursales");})
       }
 
 

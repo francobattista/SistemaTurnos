@@ -26,6 +26,7 @@ const getSucursales = () =>
         .then((response) => {   //Tipo HTTPResponse: {status: algo; code:200 ... etc}
             response.json().then( //Desencapsula el body, y lo transforma en JSON.
                     (data) => {
+                        console.log(data)
                     if(typeof(data) == 'string')
                         data = JSON.parse(data);
                     if(response.status == 200)
