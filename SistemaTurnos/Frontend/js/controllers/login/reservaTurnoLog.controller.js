@@ -138,6 +138,7 @@ export default () => {
       const getSucursalesM = () => {
         getSucursalesAuth().then((data) => 
         {
+            
             sucursales = []
             console.log(data)
             sucursales = data

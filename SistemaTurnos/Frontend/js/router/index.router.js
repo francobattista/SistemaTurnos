@@ -1,25 +1,18 @@
 import { pages } from "../controllers/index.controller.js";
 
-let content = document.getElementById('root')
+let content = document.getElementById('root'); //Elemento ROOT : Donde se dibuja y desdibujan los elementos
 
-const router = (data,route) => { //Recibe data y una ruta a donde debe direccionarse
+const router = (data,route) => { 
 
+   //Router principal: Siempre que hay un cambio de ruta, llega aca.
 
-   //Chequeo si puede ingresar a la ruta.
-   console.log(data)
    if(route != '#/login' && route != '#/reservaInvitado') //Estas son rutas que no necesitan ser validadas, cualquier usuario las puede acceder
       console.log("no tiene que validar")
-   else
-   {
-      
-   }
-      //if(!validaRutas()) Si da falso, no pudo validar las rutas, entonces te manda al login
-      //{
-      //   window.location.hash = '/#/login'
-      //   return;
-      //}
+
+
    console.log(route)
-   content.innerHTML='';
+   content.innerHTML=''; //Limpia el content.
+   
    switch(route){
       case '#/login': return content.appendChild(pages.login());
       case '#/consultafechainvitado' : return content.append(pages.fechasinvitado(data))

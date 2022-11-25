@@ -22,6 +22,7 @@ export default (data) => {
                 cancel.addEventListener('click',(event) => {
                     bajaReservaAuth(event.target.parentElement.body.idReserva).then((res)=>{
                         alert("Turno cancelado cone exito!")
+                        window.location.hash = '#/home'
                     }).catch((err)=> {
                         if(err.auth)
                             userUnauthorized();

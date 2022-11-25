@@ -7,6 +7,8 @@ const enviroment_reservas_port = process.env.RESERVAS_PORT //|| '8080' ;
 const enviroment_reservas_path = process.env.RESERVAS_PATH //|| 'http://localhost:';
 
 
+const requestHost = '127.0.0.1'; //Usado asi porque es distinto el request que el get
+//const requestPort = ;
 
 const putHeader = {
     'Content-Type':'application/json'
@@ -45,15 +47,15 @@ const getMethod = (endpoint) => {
 
 //METODO PUT
 
-const putMethod = (endpoint,body) => {
+const postMethod = (endpoint,body) => {
     return new Promise((resolve,reject) => {
         console.log("PATH + PORT")
         console.log(enviroment_reservas_path + enviroment_reservas_port )
         console.log(endpoint)
         const options = {
             port: enviroment_reservas_port,
-            hostname: '127.0.0.1', //Se deja asi, ya que el que esta en env tiene problema por los : finales
-            method: 'PUT',
+            hostname: requestHost, //Se deja asi, ya que el que esta en env tiene problema por los : finales
+            method: 'POST',
             path: endpoint,
             headers:
             {
@@ -84,4 +86,4 @@ const putMethod = (endpoint,body) => {
 }
 
 module.exports = {getMethod : getMethod,
-    putMethod: putMethod}
+    postMethod: postMethod}

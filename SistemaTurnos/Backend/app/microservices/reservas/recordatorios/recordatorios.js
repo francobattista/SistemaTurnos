@@ -1,40 +1,41 @@
 
 const reservasNotificationService = require('./../reservasNotificationsService.js')
 
-//const a = new Date()
 
-//console.log(a.getTime()/1000 - 86400000/1000)
+let timeouts = new Map();
 
-
-let timeouts = new Array();
 
 const createRecordatorio = (datosRecordatorio, reservaDate) =>{
   return new Promise((res,rej) => {
     const today = new Date();
-    console.log(reservaDate.getTime())
     const diferencia = reservaDate.getTime() - today.getTime();
 
+    
+    console.log("DIA DE RESERVA");
+    let reservaD = new Date();
+    console.log(reservaDate);
+    console.log(reservaDate.getTime());
+    
+    console.log("DIFERENCIA");
+    console.log(diferencia)
     let cuandoAviso = (reservaDate.getTime() - 24*3600*1000) - today.getTime(); //cuando le tengo q avisar
-
-    let timeout;
-
-    console.log("datosRecordatorio",datosRecordatorio)
-    console.log("dif",diferencia);
-    console.log("cuandoAviso", cuandoAviso);
-    console.log(datosRecordatorio.userId)
     if(diferencia > 24*3600*1000) //Si la dif fue mayor a 24 hs
+    {
       if(datosRecordatorio.userId != 0)
-        timeout[datosRecordatorio.userId] = (setTimeout(() => {
-          console.log("recordar")
+      {
+        timeouts.set(Number(datosRecordatorio.userId), (setTimeout(() => {
           reservasNotificationService.createNotification(datosRecordatorio.email, 'RECORDATORIO DE TURNO',`Mi loko, recorda que dentro de 24hs tenes turno en el #PotreroDeCoccaro `)
-        },cuandoAviso));  
+        },cuandoAviso)) );
+      }
       else
       {
+        console.log("DATOS DEL RECORDATORIO: ");
+        console.log(datosRecordatorio)
         setTimeout(() => {
-          console.log("recor")
           reservasNotificationService.createNotification(datosRecordatorio.email, 'RECORDATORIO DE TURNO',`Mi loko, recorda que dentro de 24hs tenes turno en el #PotreroDeCoccaro `)
         },cuandoAviso);  
       }
+    }
     //no creo nada
       
     res();
@@ -44,16 +45,11 @@ const createRecordatorio = (datosRecordatorio, reservaDate) =>{
 
 const bajaRecordatorio = (datos) => {
   return new Promise((res,rej) => {
-
     if(datos.userId != 0)
-      if(timeouts[datos.userId])
-      {
+      if(timeouts.get(Number(datos.userId)))
+        clearTimeout(timeouts.get(Number(datos.userId))); //Si el usuario es distinto de 0 y tenia un recordatorio, que lo borre
       
-        clearTimeout(timeouts[datos.userId]); //Si el usuario es distinto de 0 y tenia un recordatorio, que lo borre
-      }
 
-
-    //no creo nada
     res();
   }).catch((err) => {console.log(err)})
 }

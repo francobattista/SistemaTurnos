@@ -3,7 +3,7 @@ const http = require('http');
 const enviroment_sucursales_port = process.env.SUCURSALES_PORT || '8090' ;
 const enviroment_sucursales_host = process.env.SUCURSALES_HOST || 'http://localhost:';
 
-
+const requestHost = '127.0.0.1'
 
 //METODO GET
 const getMethod = (endpoint) => {

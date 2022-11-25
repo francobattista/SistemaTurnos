@@ -3,6 +3,7 @@ const http = require('http');
 const enviroment_sucursales_port = process.env.SUCURSALES_PORT || '8090' ;
 const enviroment_sucursales_host = process.env.SUCURSALES_HOST || 'http://localhost:';
 
+const requestHost = '127.0.0.1'; //Usado asi porque es distinto el request que el get
 
 
 //METODO GET

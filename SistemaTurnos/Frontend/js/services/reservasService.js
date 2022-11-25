@@ -1,4 +1,8 @@
+const host = 'localhost' ;
+const port = '3030';
 
+const hostAuth= 'localhost';
+const portAuth= '3020';
 
 
 const headerPost = {
@@ -20,26 +24,6 @@ const headerDelete = {
 
 }
 
-/*
-const headerPostAuth = {
-
-}
-
-
-const headerGetAuth = {
-
-}
-
-const headerPutAuth = {
-    'Content-Type': 'application/json',
-}
-
-
-const headerDeleteAuth = {
-
-}
-
-*/
 
 
 //--------------------------INVITADO-------------------------------------------
@@ -55,7 +39,7 @@ const altaReserva = (idReserva,email,userId) => {
             rej("Error, parametros erroneos")
 
         let config = {
-            method: 'PUT',
+            method: 'POST',
             headers: headerPut,
             body: JSON.stringify(
             {
@@ -63,7 +47,7 @@ const altaReserva = (idReserva,email,userId) => {
             })
         }
     
-        fetch("http://localhost:3030/api/reservas/solicitar/" + String(idReserva), config) 
+        fetch(`http://${host}:${port}/api/reservas/solicitar/` + String(idReserva), config) 
         .then((response) => {
             response.json().then((data) => 
             {
@@ -87,7 +71,7 @@ const confirmaReserva = (idReserva,email,userId) => {
         }
 
         let config = {
-            method: 'PUT',
+            method: 'POST',
             headers: headerPut,
             body: JSON.stringify(
             {
@@ -96,7 +80,7 @@ const confirmaReserva = (idReserva,email,userId) => {
             })
         }
 
-        fetch("http://localhost:3030/api/reservas/confirmar/" + String(idReserva), config) // http://localhost:3030/api/reserva/1
+        fetch(`http://${host}:${port}/api/reservas/confirmar/` + String(idReserva), config) // http://localhost:3030/api/reserva/1
         .then((response) => 
         {
             response.json().then((data) => 
@@ -126,7 +110,7 @@ const getReserva = (idReserva) =>{
 }
 
 return new Promise((res,rej) => {
-    fetch("http://localhost:3030/api/reservas/" + String(idReserva),config)
+    fetch(`http://${host}:${port}/api/reservas/` + String(idReserva),config)
     .then((response) => 
     {
         response.json().then( (data) => 
@@ -161,7 +145,7 @@ const getTurnosByParam = (idUsuario, fecha, idSucursal) =>
     queryParams.set('branchId',String(idSucursal))
     return new Promise((res,rej) => {
  
-        fetch("http://localhost:3030/api/reservas?" + queryParams.toString(),config)
+        fetch(`http://${host}:${port}/api/reservas?` + queryParams.toString(),config)
         .then((response) => {
             response.json().then( (data) => {
             if(typeof(data) == 'string')
@@ -196,7 +180,7 @@ const altaReservaAuth = (idReserva,email,userId) => {
         }
         
         let config = {
-            method: 'PUT',
+            method: 'POST',
             headers: headerPutAuth,
             body: JSON.stringify(
             {
@@ -204,7 +188,7 @@ const altaReservaAuth = (idReserva,email,userId) => {
             })
         }
     
-        fetch("http://localhost:3020/api/reservas/solicitar/" + String(idReserva), config) 
+        fetch(`http://${hostAuth}:${portAuth}/api/reservas/solicitar/` + String(idReserva), config) 
         .then((response) => {
             response.json().then((data) => 
             {
@@ -238,7 +222,7 @@ const confirmaReservaAuth = (idReserva,email,userId) => {
         }
 
         let config = {
-            method: 'PUT',
+            method: 'POST',
             headers: headerPutAuth,
             body: JSON.stringify(
             {
@@ -247,7 +231,7 @@ const confirmaReservaAuth = (idReserva,email,userId) => {
             })
         }
 
-        fetch("http://localhost:3020/api/reservas/confirmar/" + String(idReserva), config) // http://localhost:3030/api/reserva/1
+        fetch(`http://${hostAuth}:${portAuth}/api/reservas/confirmar/` + String(idReserva), config) // http://localhost:3030/api/reserva/1
         .then((response) => 
         {
             response.json().then((data) => 
@@ -285,7 +269,7 @@ const bajaReservaAuth = (idReserva) => {
     }
     
     let config = {
-        method: 'PUT',
+        method: 'DELETE',
         headers: headerPutAuth,
         body: JSON.stringify({
             userId : window.sessionStorage.getItem('userId')
@@ -294,7 +278,7 @@ const bajaReservaAuth = (idReserva) => {
 
 return new Promise((res,rej) => 
 {
-    fetch("http://localhost:3020/api/reservas/" + String(idReserva),config).
+    fetch(`http://${hostAuth}:${portAuth}/api/reservas/` + String(idReserva),config).
     then((response) => {
         response.json().then(( (data) => 
         {
@@ -335,7 +319,7 @@ const getReservaAuth = (idReserva) =>{
 }
 
 return new Promise((res,rej) => {
-    fetch("http://localhost:3020/api/reservas/" + String(idReserva),config)
+    fetch(`http://${hostAuth}:${portAuth}/api/reservas/` + String(idReserva),config)
     .then((response) => response.json().then( (data) => 
     {
         if(typeof(data) == 'string')
@@ -379,7 +363,7 @@ const getTurnosByParamAuth = (idUsuario, fecha, idSucursal) =>
     if(idSucursal) queryParams.set('branchId',String(idSucursal))
     return new Promise((res,rej) => {
  
-        fetch("http://localhost:3020/api/reservas?" + queryParams.toString(),config)
+        fetch(`http://${hostAuth}:${portAuth}/api/reservas?` + queryParams.toString(),config)
         .then((response) => response.json().then( (data) => {
             if(typeof(data) == 'string')
                 data = JSON.parse(data);

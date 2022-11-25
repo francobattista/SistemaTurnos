@@ -1,15 +1,13 @@
 import { router } from './js/router/index.router.js';
 import { dataReservaLog } from './js/controllers/login/reservaTurnoLog.controller.js'
 import { dataReservaInvitado } from './js/controllers/invitado/reservaInvitado.controller.js'
-let base_url = 'http://127.0.0.1:5500/SistemaTurnos/Frontend/html/';
 
 
 let dataFinal=null;
 
 window.addEventListener('hashchange', (ev) => {
-    console.log(ev.target.location.hash)
-    console.log(dataReservaLog)
-    console.log(dataReservaInvitado)
+
+    console.log("La direccion cambio")
     if(ev.target.location.hash == '#/consultafechainvitado')
     {
         if(dataReservaInvitado)

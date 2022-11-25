@@ -12,7 +12,7 @@ const enviroment_gatway_host = process.env.HOST || '127.0.0.1'
 
 const responseHeaders = {
     'Access-Control-Allow-Origin': '*', 
-    'Access-Control-Allow-Methods': 'POST, GET, PUT, OPTIONS',
+    'Access-Control-Allow-Methods': 'POST, GET, PUT, OPTIONS, DELETE',
     'Access-Control-Allow-Headers': 'Content-Type',
     'Content-Type': 'application/json'
 }
@@ -69,14 +69,13 @@ const bodyParser = (req,res) =>{
 const redirectRequestDelete = (req,res,url) => {};
 
 
-//MANEJO LOS PUTS. 
+//MANEJO LOS POST. 
 
-const redirectRequestPut = (req,res,url) => {
+const redirectRequestPost = (req,res,url) => {
 
     bodyParser(req,res).then( (body) => 
     {
         req.body = body;
-
         console.log(req.body)
         if(url.startsWith('/api/reservas/')) 
         {
@@ -85,7 +84,7 @@ const redirectRequestPut = (req,res,url) => {
                 createErrorResponse(res,'ERROR: En este modo solo pueden reservar como invitado');
                 return;
             }        
-            reservasService.putMethod(url,req.body).then( //No me importa si va a reservas/1 o a reservas/. Solo redirecciono y que se arregle reservas.js
+            reservasService.postMethod(url,req.body).then( //No me importa si va a reservas/1 o a reservas/. Solo redirecciono y que se arregle reservas.js
             (respuesta) => {
                 createOkReponse(res,respuesta)
             }).catch((err)=>{createErrorResponse(res,err)}); 
@@ -97,7 +96,12 @@ const redirectRequestPut = (req,res,url) => {
 
 
 };
-const redirectRequestPost = (req,res,url) => {};
+
+const redirectRequestPut = (req,res,url) => {
+
+    console.log("MANEJO DE PUT EN GATEWAY")
+
+};
 
 
 

@@ -19,8 +19,7 @@ export default () => {
     const divElement = document.createElement("div");
     divElement.innerHTML = view;
 
-
-
+    
 
     
     const addOrDeleteSucursal = () =>{
@@ -32,8 +31,8 @@ export default () => {
                     if(suc.location.coordinates[0] === element.lng && suc.location.coordinates[1] === element.lat)
                         drawed=true;
                 })
-                //if(!drawed)
-                  //  deleteMarker(suc)
+                //if(drawed)
+               //     deleteMarker(suc)
 
             })
 
@@ -58,13 +57,13 @@ export default () => {
     }
 
     const getBaseMapHome = () => {
-        let map;
+        let mapa;
         getBaseMap().then((map) => {
-            map = map;
-            console.log(map)
-            if (!map)
+            mapa = map;
+            console.log(mapa)
+            if (!mapa)
                 createMap().then((map) => {
-                    map = map;
+                    mapa = map;
                 });
 
             addOrDeleteSucursal();
@@ -83,6 +82,8 @@ export default () => {
     }
 
 
+
     getSucursalesM();
+
     return divElement;
   };

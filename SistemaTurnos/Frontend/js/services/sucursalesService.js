@@ -1,6 +1,14 @@
 
 //---------------------------------INVITADO-------------------------------
 
+const host = 'localhost' ;
+const port = '3030';
+
+const hostAuth= 'localhost';
+const portAuth= '3020';
+
+
+
 const getSucursales = () => 
 { 
 
@@ -14,7 +22,7 @@ const getSucursales = () =>
             headers: getHeaders
         };
     
-        fetch('http://localhost:3030/api/sucursales', config)
+        fetch(`http://${host}:${port}/api/sucursales`, config)
         .then((response) => {   //Tipo HTTPResponse: {status: algo; code:200 ... etc}
             response.json().then( //Desencapsula el body, y lo transforma en JSON.
                     (data) => {
@@ -47,7 +55,7 @@ const getSucursal = (idSucursal) =>
 
     return new Promise((res,rej) => {
 
-    fetch('http://localhost:3030/api/sucursales/' + String(idSucursal), config)
+    fetch(`http://${host}:${port}/api/sucursales/` + String(idSucursal), config)
     .then(response => {   
         response.json().then((data) => 
         {
@@ -80,7 +88,7 @@ const getSucursalesAuth = () => {
             headers: getHeadersAuth
         };
         console.log(getHeadersAuth)
-        fetch('http://localhost:3020/api/sucursales', config)
+        fetch(`http://${hostAuth}:${portAuth}/api/sucursales`, config)
         .then((response) => {   
                 response.json().then( 
                     (data) => {
@@ -117,7 +125,7 @@ const getSucursalAuth = (idSucursal) =>
 
     return new Promise((res,rej) => {
 
-    fetch('http://localhost:3020/api/sucursales/' + String(idSucursal), config)
+    fetch(`http://${hostAuth}:${portAuth}/api/sucursales/` + String(idSucursal), config)
     .then(response => {   
         response.json().then((data) => 
         {

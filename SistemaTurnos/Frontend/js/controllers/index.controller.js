@@ -8,7 +8,6 @@ import MisTurnos from "./login/misturnos.controller.js"
 import FechasLogueado from './login/fechaslogueado.controller.js'
 
 const pages ={
-
     login : Login,
     fechasinvitado: FechasInvitado,
     fechasLog: FechasLogueado,

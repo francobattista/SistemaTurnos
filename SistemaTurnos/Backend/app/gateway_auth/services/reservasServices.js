@@ -3,7 +3,7 @@ const http = require('http');
 const enviroment_reservas_port = process.env.RESERVAS_PORT || '8080' ;
 const enviroment_reservas_path = process.env.RESERVAS_PATH || 'http://localhost:';
 
-
+const requestHost = '127.0.0.1'
 
 const putHeader = {
     'Content-Type':'application/json'
@@ -41,12 +41,46 @@ const getMethod = (endpoint) => {
 
 //METODO PUT
 
-const putMethod = (endpoint,body) => {
+const postMethod = (endpoint,body) => {
     return new Promise((resolve,reject) => {
         const options = {
             port: enviroment_reservas_port,
-            hostname: '127.0.0.1',
-            method: 'PUT',
+            hostname: requestHost,
+            method: 'POST',
+            path: endpoint,
+            headers:
+            {
+            'Content-Type': 'application/json',
+            'Content-Length': Buffer.byteLength(body)
+            }
+          };
+
+        const request = http.request(options,(response)=>{
+
+            response.once('data', (data) => {
+                respuesta = data.toString();
+                if(response.statusCode == 200)
+                    resolve(respuesta)
+                else
+                    reject(respuesta)
+            })
+            response.once('error', (err) =>{
+                reject('ERROR: en la respuesta del server de reservas')
+            })
+        });
+
+        request.write(body);
+        request.on('error', (err) => reject('ERROR: el servidor de reservas no responde' + err))
+        request.end()
+    }) 
+}
+
+const deleteMethod = (endpoint,body) => {
+    return new Promise((resolve,reject) => {
+        const options = {
+            port: enviroment_reservas_port,
+            hostname: requestHost,
+            method: 'DELETE',
             path: endpoint,
             headers:
             {
@@ -76,4 +110,5 @@ const putMethod = (endpoint,body) => {
 }
 
 module.exports = {getMethod : getMethod,
-    putMethod: putMethod}
+    postMethod: postMethod,
+    deleteMethod:deleteMethod}

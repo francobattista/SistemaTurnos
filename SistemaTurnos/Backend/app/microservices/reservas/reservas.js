@@ -45,12 +45,14 @@ const reparteRequest = (request,response,url,method) =>{
         case 'GET': 
             processRequestGet(request,response,url);
             break;
-        case 'POST':;
+        case 'POST':
+            processRequestPost(request,response,url);
             break;
         case 'PUT': 
             processRequestPut(request,response,url);
             break;
         case 'DELETE':
+            processRequestDelete(request,response,url);
             break;
         case 'OPTIONS':
             createOkResponse(response,{message:'Options OK!'});
@@ -59,17 +61,19 @@ const reparteRequest = (request,response,url,method) =>{
     }
 }
 
-const processRequestPost = (req,res,url) => {}
-
-
 const processRequestPut = (req,res,url) => {
+    createErrorResponse(res,'ERROR: Recurso no encontrado')
+}
+
+
+const processRequestPost = (req,res,url) => {
     bodyParser(req,res).then( (body) => {
         if(body)
             req.body = JSON.parse(body);
         else
             req.body=''
 
-            const slug = url.split('/api/reservas/')[1]; // Tengo que tener una forma de diferenciar si es para usuario o sucursal... (reserva no pq nunca va a ser get)
+        const slug = url.split('/api/reservas/')[1]; // Tengo que tener una forma de diferenciar si es para usuario o sucursal... (reserva no pq nunca va a ser get)
 
         if(slug) //aunque tengo q saber si es reserva o sucursal...
         {   
@@ -78,19 +82,19 @@ const processRequestPut = (req,res,url) => {
                 if(slug.startsWith('solicitar/'))
                 {
                     const idReserva = url.split('solicitar/')[1]; // Tengo que tener una forma de diferenciar si es para usuario o sucursal... (reserva no pq nunca va a ser get)
-                    if(idReserva)
+                    if(idReserva && idReserva != 'undefined' && idReserva != 'null')
                     {   
-                        console.log(req.body.userId)
+                        console.log(idReserva)
                         if(validaID(req.body.userId))
                         {
-                            console.log("a")
+                            console.log(req.body.userId)
                             let ok = false;
                             let reservas = JSON.parse(fs.readFileSync('./reservas.json').toString())
                             reservas.map((element) => { //nO ES NECESARIO Q SEA UN MAP
                                 if(element.idReserva == idReserva)
                                     if(element.userId == -1 && element.status == 0) 
                                     {
-                                        element.userId = String(req.body.userId);
+                                        element.userId = Number(req.body.userId);
                                         element.status = 1
                                         ok = true;
                                     }
@@ -176,34 +180,6 @@ const processRequestPut = (req,res,url) => {
                     else
                         createErrorResponse(res,'ERROR: idReserva nulo')
                 }
-                else if(Number(slug)) //Es un delete
-                {
-                    if(validaID(req.body.userId))
-                    {
-                        let ok = false;
-                        let reservas = JSON.parse(fs.readFileSync('./reservas.json').toString())
-                        reservas.map((element) => { //deberia usar mejor el map jeje, lo estoy suando mal
-                            if(element.idReserva == slug && element.userId == req.body.userId)
-                            {
-                                element.userId = -1;
-                                element.email = "";
-                                element.status = 0;
-                                ok = true;
-                            }
-                        })
-                        if(ok)
-                        {
-                            fs.writeFileSync('./reservas.json', JSON.stringify(reservas));
-                            bajaRecordatorio(req.body).then((res) => {console.log("tumbo el recordatorio")});
-                            createOkResponse(res,{message: "El turno se ELIMINO con exito"});
-                            return;
-                        }
-                        else
-                            createErrorResponse(res, "ERROR: No se ha podido eliminar el turno")
-                    }
-                    else   
-                        createErrorResponse(res,"ERROR: Algun parametro es erroneo")
-                }
                 else
                     createErrorResponse(res,'ERROR: Recurso no encontrado');                
             }
@@ -220,7 +196,57 @@ const processRequestPut = (req,res,url) => {
 
  
 }
-const processRequestDelete = (req,res,url) =>{} 
+const processRequestDelete = (req,res,url) =>
+{
+
+    bodyParser(req,res).then( (body) => 
+    {
+        if(body)
+            req.body = JSON.parse(body);
+        else
+            req.body=''
+
+        const slug = url.split('/api/reservas/')[1]; // Tengo que tener una forma de diferenciar si es para usuario o sucursal... (reserva no pq nunca va a ser get)
+
+        if(slug) //aunque tengo q saber si es reserva o sucursal...
+        {   
+            if(req.body)
+            {
+                if(Number(slug)) //Es un delete
+                {
+                    if(validaID(req.body.userId))
+                    {
+                        let ok = false;
+                        let reservas = JSON.parse(fs.readFileSync('./reservas.json').toString())
+                        reservas.map((element) => { //deberia usar mejor el map jeje, lo estoy suando mal
+                        if(element.idReserva == slug && element.userId == req.body.userId)
+                        {
+                            element.userId = -1;
+                            element.email = "";
+                            element.status = 0;
+                            ok = true;
+                        }
+                        })
+                        if(ok)
+                        {
+                            fs.writeFileSync('./reservas.json', JSON.stringify(reservas));
+                            bajaRecordatorio(req.body).then((res) => {console.log("tumbo el recordatorio")});
+                            createOkResponse(res,{message: "El turno se ELIMINO con exito"});
+                            return;
+                        }
+                        else
+                            createErrorResponse(res, "ERROR: No se ha podido eliminar el turno")
+                    }
+                    else   
+                        createErrorResponse(res,"ERROR: Algun parametro es erroneo")
+                }
+            }
+        }
+    })
+
+} 
+
+
 const processRequestGet = (req,res,url) => 
 {
     let respuesta;

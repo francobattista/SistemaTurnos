@@ -4,8 +4,10 @@ const env = require('dotenv');
 
 env.config();
 
+
 const APIKEY = process.env.SENGDRID_API_KEY;
 
+const requestHost = '127.0.0.1';
 
 const confirmationEmail = (url,body) => {
 

@@ -12,7 +12,7 @@ const { auth, requiredScopes } = require('express-oauth2-jwt-bearer');
 
 const responseHeaders = {
     'Access-Control-Allow-Origin': '*', 
-    'Access-Control-Allow-Methods': 'POST, GET, PUT, OPTIONS',
+    'Access-Control-Allow-Methods': 'POST, GET, PUT, OPTIONS, DELETE',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     'Content-Type': 'application/json'
 }
@@ -134,11 +134,11 @@ app.get('/api/reservas',checkJwt, (request,response,next) => { //Get reservas co
 
 })
 
-app.put('/api/reservas/:idReserva', checkJwt, (request,response,next) => { //Baja de una reserva
+app.delete('/api/reservas/:idReserva', checkJwt, (request,response,next) => { //Baja de una reserva
     
     bodyParser(request,response).then((body)=>{
         request.body = body;
-        reservasService.putMethod(request.url,request.body).then((res) => {
+        reservasService.deleteMethod(request.url,request.body).then((res) => {
             response.body = res;
             next();
         }).catch((err) => {
@@ -150,13 +150,13 @@ app.put('/api/reservas/:idReserva', checkJwt, (request,response,next) => { //Baj
 
 })
 
-app.put('/api/reservas/solicitar/:idReserva', checkJwt, (request,response,next) => { //Solicitud de reserva
+app.post('/api/reservas/solicitar/:idReserva', checkJwt, (request,response,next) => { //Solicitud de reserva
     
     console.log("entro")
     bodyParser(request,response).then(body=>{
         console.log(body)
         request.body = body;
-        reservasService.putMethod(request.url,request.body).then((res) => {
+        reservasService.postMethod(request.url,request.body).then((res) => {
             response.body = res;
             next();
         }).catch((err) => {
@@ -168,12 +168,12 @@ app.put('/api/reservas/solicitar/:idReserva', checkJwt, (request,response,next) 
 
 })
 
-app.put('/api/reservas/confirmar/:idReserva', checkJwt,  (request,response,next) => { //Confirmacion de una reserva
+app.post('/api/reservas/confirmar/:idReserva', checkJwt,  (request,response,next) => { //Confirmacion de una reserva
     
     
     bodyParser(request,response).then(body=>{
         request.body = body;
-        reservasService.putMethod(request.url,request.body).then((res) => {
+        reservasService.postMethod(request.url,request.body).then((res) => {
             response.body = res;
             next();
         }).catch((err) => {
